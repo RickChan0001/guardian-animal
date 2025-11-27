@@ -186,7 +186,7 @@ def cadastro_clinica(request):
                     messages.error(request, f'{field}: {error}')
     else:
         form = CadastroClinicaForm()
-    return render(request, 'veterinarios/cadastro_clinica.html', {'form': form, 'titulo_pagina': 'Cadastro de Clínica'}) {'form': form, 'titulo_pagina': 'Cadastro de Clínica'})
+    return render(request, 'veterinarios/cadastro_clinica.html', {'form': form, 'titulo_pagina': 'Cadastro de Clínica'})
 
 
 @login_required(login_url='/login/')
