@@ -1,0 +1,6 @@
+Django>=5.2.0,<6.0.0
+python-decouple>=3.8
+psycopg2-binary>=2.9.9
+mysqlclient>=2.1.1
+cryptography>=3.4.0
+django-widget-tweaks>=1.5.0

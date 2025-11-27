@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% block title %}Perfil do Tutor{% endblock %}
+
+{% block content %}
+
+<div class="perfil-container">
+
+    <h2 class="perfil-title">Meu Perfil 🐾</h2>
+
+    <div class="perfil-card">
+
+        <h3 class="perfil-subtitle">Dados Pessoais</h3>
+
+        <p><strong>Nome:</strong> {{ tutor_perfil.usuario.first_name }} {{ tutor_perfil.usuario.last_name }}</p>
+        <p><strong>Usuário:</strong> {{ tutor_perfil.usuario.username }}</p>
+        <p><strong>Email:</strong> {{ tutor_perfil.usuario.email }}</p>
+
+        {% if tutor_perfil.cpf %}
+        <p><strong>CPF:</strong> {{ tutor_perfil.cpf }}</p>
+        {% endif %}
+
+        {% if tutor_perfil.telefone %}
+        <p><strong>Telefone:</strong> {{ tutor_perfil.telefone }}</p>
+        {% endif %}
+
+        {% if tutor_perfil.localizacao_placeholder %}
+        <p><strong>Localização:</strong> {{ tutor_perfil.localizacao_placeholder }}</p>
+        {% endif %}
+
+        <a href="{% url 'tutores:editar_perfil' %}" class="btn-primary edit-btn">
+            Editar Perfil
+        </a>
+
+    </div>
+
+    <div class="perfil-actions">
+        <a href="{% url 'tutores:painel_tutor' %}" class="btn-secondary">
+            ← Voltar ao Painel
+        </a>
+
+        <form method="post" action="{% url 'logout' %}" class="logout-form">
+            {% csrf_token %}
+            <button type="submit" class="btn-danger">
+                Sair
+            </button>
+        </form>
+    </div>
+
+</div>
+
+<style>
+.perfil-container {
+    max-width: 780px;
+    margin: auto;
+    padding: 25px;
+}
+
+.perfil-title {
+    font-size: 28px;
+    text-align: center;
+    margin-bottom: 25px;
+    color: var(--azul-escuro);
+}
+
+.perfil-card {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+    margin-bottom: 30px;
+}
+
+.perfil-subtitle {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: var(--azul);
+}
+
+.edit-btn {
+    margin-top: 15px;
+    display: inline-block;
+}
+
+.perfil-actions {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.btn-primary, .btn-secondary, .btn-danger {
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    color: #fff;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #5c636a;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #b52a37;
+}
+
+.logout-form {
+    display: inline;
+}
+</style>
+
+{% endblock %}

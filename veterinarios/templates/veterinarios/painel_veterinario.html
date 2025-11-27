@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Perfil do Veterinário{% endblock %}
+
+{% block content %}
+<div class="form-container">
+
+    <h2>Meu Perfil 🩺</h2>
+
+    <a href="{% url 'veterinarios:painel_veterinario' %}" class="back-link">← Voltar ao Painel</a>
+
+    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+        <h3>Dados Pessoais</h3>
+
+        <p><strong>Nome:</strong> {{ veterinario_perfil.usuario.first_name }} {{ veterinario_perfil.usuario.last_name }}</p>
+        <p><strong>Usuário:</strong> {{ veterinario_perfil.usuario.username }}</p>
+        <p><strong>Email:</strong> {{ veterinario_perfil.usuario.email }}</p>
+
+        <p><strong>CRMV:</strong> {{ veterinario_perfil.crmv }}</p>
+
+        <p><strong>Especialidade:</strong>
+            {% if veterinario_perfil.especialidade %}
+                {{ veterinario_perfil.especialidade }}
+            {% else %}
+                Não informado
+            {% endif %}
+        </p>
+
+        <p><strong>Telefone:</strong>
+            {% if veterinario_perfil.telefone %}
+                {{ veterinario_perfil.telefone }}
+            {% else %}
+                Não informado
+            {% endif %}
+        </p>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="{% url 'veterinarios:editar_perfil_veterinario' %}" class="btn btn-primary">Editar Perfil</a>
+
+        <form method="post" action="{% url 'logout' %}" style="display:inline-block; margin-left:10px;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Sair</button>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

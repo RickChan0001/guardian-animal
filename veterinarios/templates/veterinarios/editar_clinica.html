@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block content %}
+<div class="form-wrapper">
+    <div class="form-card">
+        <h2>{{ titulo_pagina }} - {{ clinica.nome }}</h2>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="photo-upload-container">
+                {% if clinica.foto %}
+                    <img id="preview" src="{{ clinica.foto.url }}" alt="preview" class="photo-preview">
+                {% else %}
+                    <img id="preview" src="{% static 'images/default-clinic.jpg' %}" alt="preview" class="photo-preview">
+                {% endif %}
+                <label class="upload-btn">
+                    Trocar Foto
+                    <input id="id_foto" type="file" name="foto" accept="image/*" style="display:none;">
+                </label>
+            </div>
+
+            <div class="form-row">
+                <div class="fields-col">
+                    {% render_field form.nome placeholder="Nome da Clínica" %}
+                    {% for error in form.nome.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+
+                    {% render_field form.cnpj placeholder="CNPJ" %}
+                    {% for error in form.cnpj.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+
+                    {% render_field form.rua placeholder="Rua" %}
+                    {% for error in form.rua.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+
+                    {% render_field form.numero placeholder="Número" %}
+                    {% for error in form.numero.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+
+                    {% render_field form.bairro placeholder="Bairro" %}
+                    {% for error in form.bairro.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+
+                    {% render_field form.telefone placeholder="Telefone" %}
+                    {% for error in form.telefone.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+
+                    {% render_field form.observacoes placeholder="Observações" %}
+                    {% for error in form.observacoes.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+
+                    {% render_field form.latitude placeholder="Latitude" %}
+                    {% for error in form.latitude.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+
+                    {% render_field form.longitude placeholder="Longitude" %}
+                    {% for error in form.longitude.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+
+                    <button type="submit" class="btn-primary">Salvar Alterações</button>
+                    <a href="{{ voltar_url|default:'/veterinarios/painel/' }}" class="back-link">← Voltar ao Painel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+const inputFoto = document.getElementById('id_foto');
+const preview = document.getElementById('preview');
+if (inputFoto) {
+  inputFoto.addEventListener('change', function() {
+      const file = this.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+          preview.src = e.target.result;
+      }
+      reader.readAsDataURL(file);
+  });
+}
+</script>
+{% endblock %}

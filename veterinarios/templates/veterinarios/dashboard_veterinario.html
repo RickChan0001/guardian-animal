@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Painel do Veterinário{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<div class="form-container">
+    <h2>Bem-vindo, Dr(a). {{ user.first_name }}!</h2>
+    <p>Gerencie suas informações e clínicas:</p>
+
+    <div style="margin-top: 25px;">
+
+        <button onclick="window.location.href='{% url 'veterinarios:perfil_veterinario' %}'">
+            Ver Perfil
+        </button>
+
+        <button onclick="window.location.href='{% url 'veterinarios:cadastro_clinica' %}'"
+                style="margin-top: 10px;">
+            Cadastrar Clínica
+        </button>
+
+        <button onclick="window.location.href='{% url 'veterinarios:painel_veterinario' %}'"
+                style="margin-top: 10px;">
+            Minhas Clínicas
+        </button>
+
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="form-card">
+  <h2>Cadastrar Animal</h2>
+
+  <div class="photo-upload-container">
+    <img id="preview" src="{% static 'images/default-pet.jpg' %}" alt="preview" class="photo-preview">
+    <label class="upload-btn">
+      Escolher Foto
+      <input id="id_foto" type="file" name="foto" accept="image/*" style="display:none;">
+    </label>
+  </div>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="form-row">
+      <div class="fields-col">
+
+        <label>Nome</label>
+        {{ form.nome }}
+
+        <label>Espécie</label>
+        {{ form.especie }}
+
+        <label>Raça</label>
+        {{ form.raca }}
+
+        <label>Idade (anos)</label>
+        {{ form.idade }}
+
+        <label>Altura (cm)</label>
+        {{ form.altura }}
+
+        <label>Peso (kg)</label>
+        {{ form.peso }}
+
+        <label>Observações</label>
+        {{ form.observacoes }}
+
+        <button class="btn-primary" type="submit" style="margin-top: 15px;">Salvar Animal</button>
+
+        <a href="{% url 'tutores:painel_tutor' %}" 
+           class="btn-primary" 
+           style="margin-top: 15px; background-color: #6c757d;">
+          ← Voltar ao Painel
+        </a>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+const inputFoto = document.getElementById('id_foto');
+const preview = document.getElementById('preview');
+if (inputFoto) {
+  inputFoto.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev){
+      preview.src = ev.target.result;
+    }
+    reader.readAsDataURL(file);
+  });
+}
+</script>
+{% endblock %}

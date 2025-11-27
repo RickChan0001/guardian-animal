@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <h1 class="mb-4">Buscar Clínicas ou Veterinários</h1>
+
+            <div class="custom-card mb-5 p-4">
+                <form method="GET" action="{% url 'tutores:buscar_veterinario' %}" class="d-flex">
+                    {{ form.termo_busca }}
+                    <button type="submit" class="btn btn-primary ms-3" style="background-color: var(--azul);">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                </form>
+            </div>
+
+            <h2>Resultados</h2>
+
+            {% if clinicas %}
+                <div class="row">
+                    {% for clinica in clinicas %}
+                        <div class="col-md-6 mb-4">
+                            <div class="custom-card d-flex align-items-center p-4">
+                                
+                                <div class="me-4 text-center">
+                                    <i class="bi bi-hospital-fill" style="font-size: 3rem; color: var(--azul-escuro);"></i>
+                                </div>
+                                
+                                <div>
+                                    <h5 class="mb-1">{{ clinica.nome }}</h5>
+
+                                    <p class="text-muted mb-1">
+                                        {{ clinica.rua }}
+                                        {% if clinica.numero %}, {{ clinica.numero }}{% endif %}
+                                        {% if clinica.bairro %} - {{ clinica.bairro }}{% endif %}
+                                    </p>
+
+                                    {% if clinica.veterinario %}
+                                        <span class="badge bg-secondary me-2">
+                                            Dr(a). {{ clinica.veterinario.usuario.first_name }}
+                                        </span>
+                                    {% endif %}
+
+                                    <span class="badge bg-warning text-dark">4.5 Estrelas</span>
+
+                                    <a href="#" class="btn btn-sm btn-link mt-2 p-0 d-block text-start">
+                                        Ver Detalhes e Agendar &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info custom-card">
+                    Nenhuma clínica ou veterinário encontrado. Tente uma nova busca!
+                </div>
+            {% endif %}
+            
+        </div>
+    </div>
+</div>
+{% endblock content %}

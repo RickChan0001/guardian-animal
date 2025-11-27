@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Painel do Tutor{% endblock %}
+
+{% block content %}
+
+<div class="form-container">
+    <h2>Bem-vindo, {{ tutor_perfil.usuario.first_name }}! 🐾</h2>
+    <p>Gerencie seus animais e informações abaixo:</p>
+
+    <div style="margin-top: 25px;">
+        <a href="{% url 'tutores:cadastro_animal' %}" class="btn-primary">
+            + Cadastrar Novo Animal
+        </a>
+
+        <a href="{% url 'tutores:perfil_tutor' %}" class="btn-primary" style="margin-top: 10px;">
+            Meu Perfil
+        </a>
+    </div>
+
+    <hr style="margin: 30px 0;">
+
+    <h3>Meus Animais</h3>
+
+    {% if animais %}
+        <div class="pet-list">
+            {% for animal in animais %}
+                <div class="pet-card">
+                    <div class="pet-photo">
+                        {% if animal.foto %}
+                            <img src="{{ animal.foto.url }}" alt="{{ animal.nome }}">
+                        {% else %}
+                            <img src="{% static 'images/default-pet.jpg' %}" alt="default">
+                        {% endif %}
+                    </div>
+
+                    <div class="pet-info">
+                        <strong>{{ animal.nome }}</strong><br>
+                        Espécie: {{ animal.get_especie_display }}<br>
+                        Raça: {{ animal.get_raca_display }}<br>
+
+                        <div class="pet-actions">
+                            <a href="{% url 'tutores:animal_profile' animal.id %}" class="btn-link">Ver Detalhes</a>
+                            <a href="{% url 'tutores:editar_animal' animal.id %}" class="btn-link">Editar</a>
+                            <a href="{% url 'tutores:deletar_animal' animal.id %}" class="btn-link text-danger">Excluir</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    {% else %}
+        <p style="margin-top: 15px;">Você ainda não cadastrou nenhum animal.</p>
+    {% endif %}
+
+</div>
+
+<style>
+.pet-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.pet-card {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    width: 250px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 0 6px rgba(0,0,0,0.1);
+}
+
+.pet-photo img {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.pet-actions {
+    margin-top: 10px;
+}
+
+.btn-link {
+    display: inline-block;
+    margin-right: 10px;
+    color: #007bff;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.btn-link.text-danger {
+    color: #dc3545 !important;
+}
+
+.btn-primary {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: var(--azul);
+    color: #fff;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+}
+</style>
+
+{% endblock %}

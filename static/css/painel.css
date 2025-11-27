@@ -1,0 +1,116 @@
+:root{
+--azul:#008ea8;
+--azul-esc:#006b80;
+--fundo:#f4f7fb;
+--text-primary: #333;
+--text-secondary: #666;
+--border-color: #ddd;
+--shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* topbar */
+.topbar{ background:var(--azul); color:#fff; padding:15px 20px; box-shadow:0 2px 6px rgba(0,0,0,0.12); }
+.container-nav{ display:flex; align-items:center; justify-content:space-between; max-width:1100px; margin:0 auto; }
+.brand{ display:flex; align-items:center; gap:10px; color:#fff; font-weight:700; font-size:18px; }
+.menu a{ color:#fff; text-decoration:none; margin-left:14px; font-size:14px; }
+.menu .user-name{ margin-left:12px; margin-right:8px; }
+
+/* painel */
+.painel-container{ max-width:1000px; margin:30px auto; background:white; padding:28px; border-radius:14px; box-shadow:var(--shadow); }
+.painel-header h2{ color:var(--azul); margin:0 0 20px 0; font-size:24px; }
+.section{ margin-top:20px; }
+
+/* animal list */
+.animal-list{ display:flex; flex-direction:column; gap:15px; margin-top:15px; }
+.animal-card{ display:flex; align-items:center; gap:15px; background:var(--azul); color:white; padding:20px; border-radius:12px; min-height:120px; }
+.animal-photo img{ width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid rgba(255,255,255,0.25); }
+.animal-body h5{ margin:0; font-size:18px; }
+.animal-body .muted{ color:rgba(255,255,255,0.95); font-size:14px; }
+.btn-edit{ background:white; color:var(--azul); padding:10px 15px; border-radius:8px; text-decoration:none; font-size:14px; font-weight:600; }
+
+/* form card */
+.form-card{ max-width:900px; margin:30px auto; background:white; padding:28px; border-radius:12px; box-shadow:var(--shadow); }
+.form-row{ display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap; }
+.photo-col{ width:160px; text-align:center; }
+.photo-col img{ width:140px; height:140px; border-radius:50%; object-fit:cover; border:6px solid #fff; box-shadow:0 6px 18px rgba(0,0,0,0.08); }
+.upload-btn{ display:inline-block; margin-top:10px; padding:10px 15px; background:var(--azul); color:white; border-radius:8px; cursor:pointer; border:none; font-size:14px; }
+.fields-col{ flex:1; display:flex; flex-direction:column; gap:15px; }
+.fields-col input, .fields-col textarea, .fields-col select{ padding:12px; border-radius:10px; border:1px solid var(--border-color); width:100%; font-size:14px; }
+.btn-primary{ margin-top:15px; padding:12px 20px; background:var(--azul); color:white; border:none; border-radius:10px; cursor:pointer; font-size:16px; font-weight:600; }
+
+/* Animal and Clinic boxes */
+.animal-box, .clinica-box {
+    position: relative;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: flex-start;
+    min-height: 120px;
+}
+
+.edit-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.edit-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 16px;
+    transition: color 0.3s;
+}
+
+.edit-link:hover {
+    color: var(--azul);
+}
+
+.animal-content, .clinica-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.animal-photo, .clinica-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #eee;
+    margin-right: 20px;
+}
+
+.animal-info, .clinica-info {
+    flex: 1;
+    font-size: 14px;
+}
+
+.animal-info strong, .clinica-info strong {
+    font-size: 16px;
+    color: var(--text-primary);
+}
+
+@media (max-width:768px){
+.form-row{ flex-direction:column; }
+.photo-col{ width:100%; display:flex; justify-content:center; }
+.animal-box, .clinica-box{ flex-direction:column; text-align:center; }
+.animal-content, .clinica-content{ flex-direction:column; }
+.animal-photo, .clinica-photo{ margin-bottom:15px; margin-right:0; }
+}
+
+.footer-fixed {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: var(--azul);
+    color: #fff;
+    text-align: center;
+    padding: 12px;
+    font-size: 0.95rem;
+    z-index: 1000;
+}

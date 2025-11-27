@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Guardião Animal</title>
+
+  <link rel="stylesheet" href="{% static 'css/painel.css' %}">
+
+  <style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    main {
+        flex: 1;
+        padding: 20px 0;
+    }
+  </style>
+
+</head>
+<body>
+
+  <nav class="topbar">
+    <div class="container-nav">
+
+      <div class="brand">
+        <img src="{% static 'images/dogdoctor.png' %}" alt="logo" style="height:36px;">
+        <span class="brand-text">Guardião Animal</span>
+      </div>
+
+      <div class="menu">
+        <a href="{% url 'home' %}">Home</a>
+        <a href="{% url 'tutores:painel_tutor' %}">Tutores</a>
+        <a href="{% url 'veterinarios:painel_veterinario' %}">Veterinários</a>
+
+        {% if request.user.is_authenticated %}
+          <span class="user-name">Olá, {{ request.user.first_name }}</span>
+          <a href="{% url 'logout' %}">Sair</a>
+        {% else %}
+          <a href="{% url 'login' %}">Login</a>
+        {% endif %}
+      </div>
+
+    </div>
+  </nav>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer style="text-align:center;padding:12px;background:var(--azul);color:#fff;">
+    © 2025 Guardião Animal — Cuidando com carinho 💙
+  </footer>
+
+</body>
+</html>

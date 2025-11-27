@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="form-container">
+
+    <h2>Editar Perfil 🩺</h2>
+
+    <a href="{% url 'veterinarios:perfil_veterinario' %}" class="back-link">← Voltar ao Perfil</a>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="form-group">{% render_field form.username placeholder="Usuário" %}</div>
+        <div class="form-group">{% render_field form.first_name placeholder="Nome" %}</div>
+        <div class="form-group">{% render_field form.last_name placeholder="Sobrenome" %}</div>
+        <div class="form-group">{% render_field form.email placeholder="E-mail" %}</div>
+
+        <div class="form-group">
+            <label for="id_especialidade">Especialidade</label>
+            <input type="text" name="especialidade" id="id_especialidade"
+                   value="{{ veterinario.especialidade }}" class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label for="id_telefone">Telefone</label>
+            <input type="text" name="telefone" id="id_telefone"
+                   value="{{ veterinario.telefone }}" class="form-control">
+        </div>
+
+        <button type="submit" class="btn-submit">Salvar Alterações</button>
+    </form>
+
+</div>
+{% endblock %}

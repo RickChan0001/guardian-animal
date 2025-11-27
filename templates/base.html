@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Guardião Animal</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        body {
+            background: url("{% static 'img/patas_fundo.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Topbar -->
+<header class="topbar">
+    <div class="container-nav">
+        <div class="brand">
+            🐾 Guardião Animal
+        </div>
+        <nav class="menu">
+            {% if user.is_authenticated %}
+                <a href="/">Home</a>
+
+                {% if user.tutor %}
+                    <a href="{% url 'tutores:perfil_tutor' %}">Perfil</a>
+
+                {% elif user.veterinario %}
+                    <a href="{% url 'veterinarios:perfil_veterinario' %}">Perfil</a>
+                {% endif %}
+
+                <span class="user-name">{{ user.first_name }}</span>
+
+            {% else %}
+                <a href="/">Home</a>
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'tutores:cadastro_tutor' %}">Cadastro</a>
+                <a href="{% url 'veterinarios:cadastro_veterinario' %}">Veterinário</a>
+            {% endif %}
+        </nav>
+    </div>
+</header>
+
+<main class="main">
+    {% if messages %}
+        <div class="messages-container" style="max-width: 800px; margin: 20px auto; padding: 0 20px;">
+            {% for message in messages %}
+                <div class="alert" style=
+                    padding:12px;
+                    margin-bottom: 10px;
+                    border-radius: 5px;
+                    {% if message.tags == 'error' %}background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;
+                    {% elif message.tags == 'success' %}background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;
+                    {% else %}background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb;{% endif %}
+                >
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="footer-fixed">
+    © 2025 Guardião Animal — Cuidando com carinho 💙
+</footer>
+
+<style>
+.footer-fixed {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: var(--azul);
+    color: #fff;
+    text-align: center;
+    padding: 12px;
+    font-size: 0.95rem;
+    z-index: 1000;
+}
+</style>
+
+</body>
+</html>

@@ -1,0 +1,209 @@
+:root {
+    --azul: #008ea8;
+    --azul-esc: #006b80;
+    --fundo: #f4f7fb;
+    --text-primary: #333;
+    --text-secondary: #666;
+    --border-color: #ddd;
+    --shadow-light: 0 4px 8px rgba(0,0,0,0.1);
+    --shadow-strong: 0 4px 12px rgba(0,0,0,0.1);
+    --font-base: 14px;
+    --font-large: 16px;
+    --font-title: 24px;
+    --radius: 10px;
+    --btn-padding: 12px 20px;
+}
+
+body {
+    background-color: var(--fundo);
+    background: var(--fundo) url('../img/patas_fundo.jpg') no-repeat center center fixed;
+    background-size: cover;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    font-size: var(--font-base);
+    color: var(--text-primary);
+}
+
+.topbar {
+    background: var(--azul);
+    color: #fff;
+    padding: 15px 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+.container-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.menu {
+    display: flex;
+    align-items: center;
+}
+
+.menu a {
+    color: #fff;
+    text-decoration: none;
+    margin-left: 14px;
+    font-size: var(--font-base);
+    transition: 0.3s;
+}
+
+.menu a:hover {
+    color: #c9f0ff;
+}
+
+.menu .user-name {
+    margin: 0 8px 0 12px;
+    font-weight: 600;
+}
+
+.form-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 85vh;
+    padding: 30px;
+}
+
+.form-card {
+    background: rgba(255, 255, 255, 0.97);
+    padding: 32px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-strong);
+    width: 100%;
+    max-width: 460px;
+    text-align: center;
+}
+
+.form-container {
+    max-width: 1000px;
+    margin: 30px auto;
+    background: white;
+    padding: 28px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-strong);
+}
+
+.photo-upload-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.photo-preview {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--border-color);
+    box-shadow: var(--shadow-light);
+}
+
+.upload-btn {
+    display: inline-block;
+    margin-top: 10px;
+    padding: var(--btn-padding);
+    background: var(--azul);
+    color: white;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: 0.3s;
+    border: none;
+    font-size: var(--font-base);
+}
+
+.upload-btn:hover {
+    background: var(--azul-esc);
+}
+
+.form-card h2 {
+    color: var(--azul-esc);
+    margin-bottom: 20px;
+    font-size: var(--font-title);
+}
+
+.form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.fields-col input {
+    width: 100%;
+    padding: 12px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    font-size: var(--font-base);
+    transition: 0.2s;
+}
+
+.fields-col input:focus {
+    border-color: var(--azul);
+    box-shadow: 0 0 6px rgba(0,142,168,0.3);
+    outline: none;
+}
+
+.btn-primary {
+    background: var(--azul);
+    color: white;
+    padding: var(--btn-padding);
+    border: none;
+    border-radius: var(--radius);
+    font-size: var(--font-large);
+    cursor: pointer;
+    margin-top: 10px;
+    transition: 0.3s;
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    background: var(--azul-esc);
+}
+
+.footer {
+    background: var(--azul);
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+    font-size: var(--font-base);
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .form-card {
+        width: 90%;
+        padding: 24px;
+    }
+    .form-container {
+        margin: 20px;
+        padding: 20px;
+    }
+
+    .container-nav {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .menu {
+        flex-direction: column;
+        align-items: center;
+    }
+    .menu a {
+        margin: 5px 0;
+    }
+}

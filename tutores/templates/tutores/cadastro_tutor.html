@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="form-wrapper">
+    <div class="form-card">
+        <h2>Cadastro de Tutor</h2>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="fields-col">
+
+                    {% render_field form.username placeholder="Nome de usuário" %}
+                    {% if form.username.errors %}
+                        <div class="error-msg">{{ form.username.errors }}</div>
+                    {% endif %}
+
+                    {% render_field form.first_name placeholder="Nome" %}
+                    {% if form.first_name.errors %}
+                        <div class="error-msg">{{ form.first_name.errors }}</div>
+                    {% endif %}
+
+                    {% render_field form.last_name placeholder="Sobrenome" %}
+                    {% if form.last_name.errors %}
+                        <div class="error-msg">{{ form.last_name.errors }}</div>
+                    {% endif %}
+
+                    {% render_field form.email placeholder="E-mail" %}
+                    {% if form.email.errors %}
+                        <div class="error-msg">{{ form.email.errors }}</div>
+                    {% endif %}
+
+                    {% render_field form.cpf placeholder="CPF" %}
+                    {% if form.cpf.errors %}
+                        <div class="error-msg">{{ form.cpf.errors }}</div>
+                    {% endif %}
+
+                    {% render_field form.telefone placeholder="Telefone" %}
+                    {% if form.telefone.errors %}
+                        <div class="error-msg">{{ form.telefone.errors }}</div>
+                    {% endif %}
+
+                    {% render_field form.password1 placeholder="Senha" %}
+                    {% if form.password1.errors %}
+                        <div class="error-msg">{{ form.password1.errors }}</div>
+                    {% endif %}
+
+                    {% render_field form.password2 placeholder="Confirmar senha" %}
+                    {% if form.password2.errors %}
+                        <div class="error-msg">{{ form.password2.errors }}</div>
+                    {% endif %}
+
+                    <button type="submit" class="btn-primary">Cadastrar</button>
+
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.error-msg {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: -10px;
+    margin-bottom: 10px;
+}
+</style>
+
+{% endblock %}

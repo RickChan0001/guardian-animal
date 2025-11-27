@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div style="display:flex;align-items:center;justify-content:center;min-height:70vh; padding:20px;">
+  <div style="
+      max-width:700px;
+      width:100%;
+      text-align:center;
+      background:#fff;
+      padding:40px;
+      border-radius:12px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.08);
+    ">
+    
+    <!-- Logo -->
+    <img src="{% static 'img/dogdoctor.png' %}" alt="logo" style="width:120px; margin-bottom:20px;">
+
+    <!-- Título e slogan -->
+    <h1 style="margin-top:0;">Guardião Animal</h1>
+    <p style="margin-bottom: 20px;">Cuidando com carinho e amor.</p>
+
+    <!-- Links de login/cadastro -->
+    {% if user.is_authenticated %}
+        <p>Bem-vindo, {{ user.first_name|default:user.username }}!</p>
+        <a href="{% url 'logout' %}" class="btn-primary" style="margin-top:10px;">Sair</a>
+    {% else %}
+        <a href="{% url 'login' %}" class="btn-primary" style="margin-top:10px;">Entrar</a>
+        <div style="margin-top:12px;">
+            <a href="{% url 'tutores:cadastro_tutor' %}" style="margin-right:8px;">Cadastrar como Tutor</a>
+            <a href="{% url 'veterinarios:cadastro_veterinario' %}">Cadastrar como Veterinário</a>
+        </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<!-- Footer fixo -->
+<footer style="
+    position:fixed;
+    bottom:0;
+    width:100%;
+    background:#f4f4f4;
+    text-align:center;
+    padding:12px 0;
+    box-shadow:0 -2px 5px rgba(0,0,0,0.05);
+    font-size:14px;
+">
+    © 2025 Guardião Animal — Cuidando com carinho 💙
+</footer>
+{% endblock %}
