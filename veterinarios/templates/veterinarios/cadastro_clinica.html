@@ -15,7 +15,7 @@
                 <label class="upload-btn" for="id_foto">
                     Escolher Foto
                 </label>
-                {{ form.foto }}
+                {% render_field form.foto style="display:none;" %}
             </div>
 
             <div class="form-row">
@@ -40,6 +40,14 @@
 
                     {% render_field form.observacoes placeholder="Observações" %}
                     {% for error in form.observacoes.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+
+                    {% if form.non_field_errors %}
+                        <div class="error-msg">
+                            {% for error in form.non_field_errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
 
                     <button type="submit" class="btn-primary">Salvar Clínica</button>
                     <a href="{{ voltar_url|default:'/veterinarios/painel/' }}" class="back-link">← Voltar</a>

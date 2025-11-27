@@ -145,14 +145,21 @@ def cadastro_clinica(request):
             try:
                 with transaction.atomic():
                     clinica = form.save(commit=False)
-                    # Salva a clínica primeiro
+                    # Atribui o veterinário antes de salvar
+                    clinica.veterinario = veterinario_perfil
+                    # Salva a clínica
                     clinica.save()
-                    # Depois atualiza o relacionamento usando raw SQL se necessário
-                    try:
-                        clinica.veterinario = veterinario_perfil
+                    messages.success(request, 'Clínica cadastrada com sucesso!')
+                    return redirect('veterinarios:painel_veterinario')
+            except Exception as e:
+                # Se der erro ao salvar normalmente, tenta usar raw SQL
+                error_msg = str(e)
+                try:
+                    with transaction.atomic():
+                        clinica = form.save(commit=False)
+                        # Salva sem o veterinário primeiro
                         clinica.save()
-                    except:
-                        # Se der erro, tenta atualizar usando raw SQL
+                        # Depois atualiza o relacionamento usando raw SQL
                         with connection.cursor() as cursor:
                             cursor.execute("SHOW COLUMNS FROM veterinarios_clinica")
                             colunas = [row[0] for row in cursor.fetchall()]
@@ -166,13 +173,20 @@ def cadastro_clinica(request):
                                     f"UPDATE veterinarios_clinica SET {coluna_veterinario} = %s WHERE id = %s",
                                     [veterinario_perfil.id, clinica.id]
                                 )
-                    messages.success(request, 'Clínica cadastrada com sucesso!')
-                    return redirect('veterinarios:painel_veterinario')
-            except Exception as e:
-                messages.error(request, f'Erro ao cadastrar clínica: {e}')
+                        messages.success(request, 'Clínica cadastrada com sucesso!')
+                        return redirect('veterinarios:painel_veterinario')
+                except Exception as e2:
+                    messages.error(request, f'Erro ao cadastrar clínica: {str(e2)}')
+                    import traceback
+                    print(traceback.format_exc())
+        else:
+            # Se o formulário não é válido, mostra os erros
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{field}: {error}')
     else:
         form = CadastroClinicaForm()
-    return render(request, 'veterinarios/cadastro_clinica.html', {'form': form, 'titulo_pagina': 'Cadastro de Clínica'})
+    return render(request, 'veterinarios/cadastro_clinica.html', {'form': form, 'titulo_pagina': 'Cadastro de Clínica'}) {'form': form, 'titulo_pagina': 'Cadastro de Clínica'})
 
 
 @login_required(login_url='/login/')
