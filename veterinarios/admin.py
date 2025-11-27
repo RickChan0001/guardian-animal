@@ -3,8 +3,13 @@ from .models import Veterinario, Clinica, Service, Appointment, Notification, Ra
 
 @admin.register(Veterinario)
 class VeterinarioAdmin(admin.ModelAdmin):
-    list_display = ('usuario', 'crmv', 'telefone', 'cpf', 'especialidade')
-    search_fields = ('usuario__username', 'usuario__first_name', 'crmv', 'cpf')
+    list_display = ('usuario', 'crmv', 'telefone', 'get_cpf', 'especialidade')
+    search_fields = ('usuario__username', 'usuario__first_name', 'crmv', 'usuario__cpf')
+    
+    def get_cpf(self, obj):
+        """Retorna o CPF do usuário vinculado"""
+        return obj.usuario.cpf if hasattr(obj.usuario, 'cpf') else '-'
+    get_cpf.short_description = 'CPF'
 
 @admin.register(Clinica)
 class ClinicaAdmin(admin.ModelAdmin):

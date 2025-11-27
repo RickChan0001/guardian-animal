@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Deletar Clínica{% endblock %}
+
+{% block content %}
+
+<div class="form-container">
+
+    <h2>Deletar Clínica 🩺</h2>
+
+    <div style="background-color: #fff3cd; padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #ffc107;">
+        <p><strong>Atenção!</strong> Esta ação não pode ser desfeita.</p>
+        <p>Tem certeza que deseja deletar a clínica <strong>{{ clinica.nome }}</strong>?</p>
+    </div>
+
+    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+        <h3>Informações da Clínica</h3>
+        <p><strong>Nome:</strong> {{ clinica.nome }}</p>
+        {% if clinica.cnpj %}
+        <p><strong>CNPJ:</strong> {{ clinica.cnpj }}</p>
+        {% endif %}
+        {% if clinica.telefone %}
+        <p><strong>Telefone:</strong> {{ clinica.telefone }}</p>
+        {% endif %}
+    </div>
+
+    <form method="POST" style="text-align: center;">
+        {% csrf_token %}
+        <button type="submit" class="btn-danger" style="margin-right: 10px;">
+            Sim, Deletar
+        </button>
+        <a href="{{ voltar_url|default:'/veterinarios/painel/' }}" class="btn-secondary">
+            Cancelar
+        </a>
+    </form>
+
+</div>
+
+<style>
+.form-container {
+    max-width: 600px;
+    margin: auto;
+    padding: 25px;
+}
+
+.btn-danger, .btn-secondary {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    color: #fff;
+    cursor: pointer;
+    border: none;
+    display: inline-block;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #b52a37;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #5c636a;
+}
+</style>
+
+{% endblock %}
+

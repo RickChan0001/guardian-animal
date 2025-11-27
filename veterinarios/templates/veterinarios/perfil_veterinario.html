@@ -1,41 +1,51 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Perfil do Tutor{% endblock %}
+{% block title %}Perfil do Veterinário{% endblock %}
 
 {% block content %}
 
 <div class="perfil-container">
 
-    <h2 class="perfil-title">Meu Perfil 🐾</h2>
+    <h2 class="perfil-title">Meu Perfil 🩺</h2>
 
     <div class="perfil-card">
 
         <h3 class="perfil-subtitle">Dados Pessoais</h3>
 
-        <p><strong>Nome:</strong> {{ tutor_perfil.usuario.first_name }} {{ tutor_perfil.usuario.last_name }}</p>
-        <p><strong>Usuário:</strong> {{ tutor_perfil.usuario.username }}</p>
-        <p><strong>Email:</strong> {{ tutor_perfil.usuario.email }}</p>
+        <p><strong>Nome:</strong> {{ veterinario_perfil.usuario.first_name }} {{ veterinario_perfil.usuario.last_name }}</p>
+        <p><strong>Usuário:</strong> {{ veterinario_perfil.usuario.username }}</p>
+        <p><strong>Email:</strong> {{ veterinario_perfil.usuario.email }}</p>
 
-        {% if tutor_perfil.cpf %}
-        <p><strong>CPF:</strong> {{ tutor_perfil.cpf }}</p>
+        <p><strong>CRMV:</strong> {{ veterinario_perfil.crmv }}</p>
+
+        {% if veterinario_perfil.cpf %}
+        <p><strong>CPF:</strong> {{ veterinario_perfil.cpf }}</p>
         {% endif %}
 
-        {% if tutor_perfil.telefone %}
-        <p><strong>Telefone:</strong> {{ tutor_perfil.telefone }}</p>
-        {% endif %}
+        <p><strong>Especialidade:</strong>
+            {% if veterinario_perfil.especialidade %}
+                {{ veterinario_perfil.especialidade }}
+            {% else %}
+                Não informado
+            {% endif %}
+        </p>
 
-        {% if tutor_perfil.localizacao_placeholder %}
-        <p><strong>Localização:</strong> {{ tutor_perfil.localizacao_placeholder }}</p>
-        {% endif %}
+        <p><strong>Telefone:</strong>
+            {% if veterinario_perfil.telefone %}
+                {{ veterinario_perfil.telefone }}
+            {% else %}
+                Não informado
+            {% endif %}
+        </p>
 
-        <a href="{% url 'tutores:editar_perfil' %}" class="btn-primary edit-btn">
+        <a href="{% url 'veterinarios:editar_perfil_veterinario' %}" class="btn-primary edit-btn">
             Editar Perfil
         </a>
 
     </div>
 
     <div class="perfil-actions">
-        <a href="{% url 'tutores:painel_tutor' %}" class="btn-secondary">
+        <a href="{% url 'veterinarios:painel_veterinario' %}" class="btn-secondary">
             ← Voltar ao Painel
         </a>
 
@@ -100,6 +110,14 @@
     border: none;
 }
 
+.btn-primary {
+    background-color: var(--azul);
+}
+
+.btn-primary:hover {
+    background-color: var(--azul-escuro);
+}
+
 .btn-secondary {
     background-color: #6c757d;
 }
@@ -122,3 +140,4 @@
 </style>
 
 {% endblock %}
+

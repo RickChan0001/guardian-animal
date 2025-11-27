@@ -25,16 +25,18 @@
         </div>
         <nav class="menu">
             {% if user.is_authenticated %}
-                <a href="/">Home</a>
-
                 {% if user.tutor %}
+                    <a href="{% url 'tutores:painel_tutor' %}">Painel</a>
                     <a href="{% url 'tutores:perfil_tutor' %}">Perfil</a>
-
                 {% elif user.veterinario %}
+                    <a href="{% url 'veterinarios:painel_veterinario' %}">Painel</a>
                     <a href="{% url 'veterinarios:perfil_veterinario' %}">Perfil</a>
+                {% else %}
+                    <a href="/">Home</a>
                 {% endif %}
 
                 <span class="user-name">{{ user.first_name }}</span>
+                <a href="{% url 'logout' %}" style="color: #dc3545;">Sair</a>
 
             {% else %}
                 <a href="/">Home</a>

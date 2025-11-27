@@ -10,8 +10,13 @@ Configurado e otimizado para:
 from pathlib import Path
 import os
 from decouple import config, Csv
-import pymysql
-pymysql.install_as_MySQLdb()
+
+# Importação opcional do pymysql (apenas se for usar MySQL)
+try:
+    import pymysql
+    pymysql.install_as_MySQLdb()
+except ImportError:
+    pass  # pymysql não é necessário se não estiver usando MySQL
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -62,12 +67,12 @@ TEMPLATES = [
 WSGI_APPLICATION = 'guardiao_animal.wsgi.application'
 
 # Configuração do banco de dados via variáveis de ambiente
-DB_ENGINE = config('DB_ENGINE', default='django.db.backends.postgresql')
+DB_ENGINE = config('DB_ENGINE', default='django.db.backends.mysql')
 DB_NAME = config('DB_NAME', default='')
 DB_USER = config('DB_USER', default='')
 DB_PASSWORD = config('DB_PASSWORD', default='')
 DB_HOST = config('DB_HOST', default='localhost')
-DB_PORT = config('DB_PORT', default='5432')
+DB_PORT = config('DB_PORT', default='3306')
 
 # Configuração do banco de dados
 # Se DB_NAME estiver vazio, usa SQLite (apenas para desenvolvimento local)

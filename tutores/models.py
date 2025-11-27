@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from PIL import Image
+import os
 
 # Usuário personalizado
 class CustomUser(AbstractUser):
@@ -83,12 +84,15 @@ class Animal(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        if self.foto and self.foto.path:
+        if self.foto:
             try:
-                img = Image.open(self.foto.path)
-                img.thumbnail((300, 300))
-                img.save(self.foto.path, quality=85)
-            except:
+                # Verifica se o arquivo existe antes de processar
+                if hasattr(self.foto, 'path') and os.path.exists(self.foto.path):
+                    img = Image.open(self.foto.path)
+                    img.thumbnail((300, 300))
+                    img.save(self.foto.path, quality=85)
+            except Exception as e:
+                # Se houver erro no processamento, apenas ignora mas não impede o salvamento
                 pass
 
     def __str__(self):

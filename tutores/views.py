@@ -4,12 +4,15 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.contrib import messages
 from .forms import CadastroTutorForm, CadastroAnimalForm, EditarPerfilTutorForm
-from .models import Tutor, Animal
+from .models import Tutor, Animal, CustomUser
 
 def home(request):
-    # Logout any existing user when accessing home page
+    # Se o usuário estiver autenticado, redireciona para o painel apropriado
     if request.user.is_authenticated:
-        logout(request)
+        if hasattr(request.user, 'tutor'):
+            return redirect('tutores:painel_tutor')
+        elif hasattr(request.user, 'veterinario'):
+            return redirect('veterinarios:painel_veterinario')
     return render(request, 'home.html')
 
 def login_view(request):
@@ -47,8 +50,21 @@ def cadastro_tutor(request):
             try:
                 # Usa transação atômica para garantir consistência no banco online
                 with transaction.atomic():
-                    # Cria o usuário primeiro
-                    user = form.save()
+                    # Gera username automaticamente a partir do email (parte antes do @)
+                    email = form.cleaned_data.get('email')
+                    username = email.split('@')[0] if email else None
+                    
+                    # Garante que o username seja único
+                    base_username = username
+                    counter = 1
+                    while CustomUser.objects.filter(username=username).exists():
+                        username = f"{base_username}{counter}"
+                        counter += 1
+                    
+                    # Define o username antes de salvar
+                    user = form.save(commit=False)
+                    user.username = username
+                    user.save()
                     
                     # Verifica se já existe um tutor para este usuário (proteção contra duplicatas)
                     if Tutor.objects.filter(usuario=user).exists():
@@ -115,6 +131,9 @@ def cadastro_animal(request):
             messages.success(request, 'Animal cadastrado com sucesso!')
             # Após cadastro, redirecionar para painel onde as informações aparecem
             return redirect('tutores:painel_tutor')
+        else:
+            # Se o formulário não for válido, mostra os erros
+            messages.error(request, 'Por favor, corrija os erros no formulário.')
     else:
         form = CadastroAnimalForm()
     return render(request, 'tutores/cadastro_animal.html', {'form': form})
@@ -143,7 +162,7 @@ def editar_perfil(request):
                 # Usa transação atômica para garantir consistência no banco online
                 with transaction.atomic():
                     # Atualiza os dados do usuário
-                    form.save()
+                    user = form.save()
 
                     # Atualiza os dados do perfil de tutor usando os dados limpos do formulário
                     cpf = form.cleaned_data.get('cpf')

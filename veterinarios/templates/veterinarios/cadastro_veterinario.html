@@ -2,39 +2,83 @@
 {% load widget_tweaks %}
 
 {% block content %}
-<div class="form-container">
-    <div class="form-box">
+<div class="form-wrapper">
+    <div class="form-card">
         <h2>Cadastro de Veterinário</h2>
 
         <form method="POST">
             {% csrf_token %}
-            {% render_field form.nome_completo placeholder="Nome completo" %}
-            {% for error in form.nome_completo.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+            <div class="form-row">
+                <div class="fields-col">
 
-            {% render_field form.email placeholder="E-mail" %}
-            {% for error in form.email.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+                    {% if form.errors %}
+                        <div class="error-messages" style="color: red; margin-bottom: 15px;">
+                            <strong>Erros no formulário:</strong>
+                            {{ form.errors }}
+                        </div>
+                    {% endif %}
 
-            {% render_field form.cpf placeholder="CPF (Somente números)" %}
-            {% for error in form.cpf.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+                    {% render_field form.nome_completo placeholder="Nome completo" %}
+                    {% if form.nome_completo.errors %}
+                        <div class="error-msg">{{ form.nome_completo.errors }}</div>
+                    {% endif %}
 
-            {% render_field form.crmv placeholder="CRMV (Somente números)" %}
-            {% for error in form.crmv.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+                    {% render_field form.email placeholder="E-mail" %}
+                    {% if form.email.errors %}
+                        <div class="error-msg">{{ form.email.errors }}</div>
+                    {% endif %}
 
-            {% render_field form.telefone placeholder="Telefone (Somente números)" %}
-            {% for error in form.telefone.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+                    {% render_field form.cpf placeholder="CPF (opcional)" %}
+                    {% if form.cpf.errors %}
+                        <div class="error-msg">{{ form.cpf.errors }}</div>
+                    {% endif %}
 
-            {% render_field form.especialidade placeholder="Especialidade (opcional)" %}
-            {% for error in form.especialidade.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+                    {% render_field form.crmv placeholder="CRMV" %}
+                    {% if form.crmv.errors %}
+                        <div class="error-msg">{{ form.crmv.errors }}</div>
+                    {% endif %}
 
-            {% render_field form.password1 placeholder="Senha" %}
-            {% for error in form.password1.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+                    {% render_field form.telefone placeholder="Telefone" %}
+                    {% if form.telefone.errors %}
+                        <div class="error-msg">{{ form.telefone.errors }}</div>
+                    {% endif %}
 
-            {% render_field form.password2 placeholder="Confirmar Senha" %}
-            {% for error in form.password2.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
+                    {% render_field form.especialidade placeholder="Especialidade (opcional)" %}
+                    {% if form.especialidade.errors %}
+                        <div class="error-msg">{{ form.especialidade.errors }}</div>
+                    {% endif %}
 
-            <button type="submit" class="btn-submit">Cadastrar</button>
-            <a href="/login/" class="back-link">← Voltar</a>
+                    {% render_field form.password1 placeholder="Senha" %}
+                    {% if form.password1.errors %}
+                        <div class="error-msg">{{ form.password1.errors }}</div>
+                    {% endif %}
+
+                    {% render_field form.password2 placeholder="Confirmar senha" %}
+                    {% if form.password2.errors %}
+                        <div class="error-msg">{{ form.password2.errors }}</div>
+                    {% endif %}
+
+                    <button type="submit" class="btn-primary">Cadastrar</button>
+
+                    <a href="{% url 'login' %}" 
+                       class="btn-primary" 
+                       style="margin-top: 15px; background-color: #6c757d;">
+                        ← Voltar
+                    </a>
+
+                </div>
+            </div>
         </form>
     </div>
 </div>
+
+<style>
+.error-msg {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: -10px;
+    margin-bottom: 10px;
+}
+</style>
+
 {% endblock %}

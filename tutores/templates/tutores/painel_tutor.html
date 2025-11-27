@@ -69,6 +69,12 @@
                 {% if animal.observacoes %}
                 <p><strong>Observações:</strong> {{ animal.observacoes }}</p>
                 {% endif %}
+
+                <div class="pet-card-actions">
+                    <a href="{% url 'tutores:editar_animal' animal.id %}" class="btn-edit">
+                        ✏️ Editar Animal
+                    </a>
+                </div>
             </div>
 
         </div>
@@ -181,6 +187,30 @@
 .pet-info h4 {
     margin-bottom: 5px;
     font-size: 20px;
+}
+
+.pet-card-actions {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.btn-edit {
+    display: inline-block;
+    width: 100%;
+    padding: 10px 15px;
+    background-color: #2a7bd6;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+.btn-edit:hover {
+    background-color: #1e5fa3;
+    color: #fff;
 }
 
 .no-pets {

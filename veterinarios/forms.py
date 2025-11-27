@@ -19,6 +19,12 @@ class CadastroVeterinarioForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['email', 'password1', 'password2']
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Remove o campo username do formulário
+        if 'username' in self.fields:
+            del self.fields['username']
 
     def clean_crmv(self):
         crmv = self.cleaned_data.get('crmv')
@@ -88,6 +94,7 @@ class CadastroVeterinarioForm(UserCreationForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         email = self.cleaned_data['email']
+        # Gera username automaticamente a partir do email
         base_username = email.split('@')[0]
         username = base_username
         counter = 1
@@ -122,11 +129,10 @@ class CadastroClinicaForm(forms.ModelForm):
         model = Clinica
         fields = [
             'nome', 'cnpj', 'rua', 'numero', 'bairro',
-            'observacoes', 'telefone', 'foto',
-            'latitude', 'longitude'
+            'observacoes', 'telefone', 'foto'
         ]
         widgets = {
-            'observacoes': forms.Textarea(attrs={'rows': 2}),
+            'observacoes': forms.Textarea(attrs={'rows': 3}),
         }
 
 

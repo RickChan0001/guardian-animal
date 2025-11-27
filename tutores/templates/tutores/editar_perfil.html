@@ -10,12 +10,6 @@
 
         <div class="fields-col">
 
-            <label>Usuário</label>
-            {{ form.username }}
-            {% if form.username.errors %}
-                <div class="error-msg">{{ form.username.errors }}</div>
-            {% endif %}
-
             <label>E-mail</label>
             {{ form.email }}
             {% if form.email.errors %}

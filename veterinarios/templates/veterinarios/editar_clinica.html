@@ -16,10 +16,10 @@
                 {% else %}
                     <img id="preview" src="{% static 'images/default-clinic.jpg' %}" alt="preview" class="photo-preview">
                 {% endif %}
-                <label class="upload-btn">
+                <label class="upload-btn" for="id_foto">
                     Trocar Foto
-                    <input id="id_foto" type="file" name="foto" accept="image/*" style="display:none;">
                 </label>
+                {{ form.foto }}
             </div>
 
             <div class="form-row">
@@ -45,12 +45,6 @@
                     {% render_field form.observacoes placeholder="Observações" %}
                     {% for error in form.observacoes.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
 
-                    {% render_field form.latitude placeholder="Latitude" %}
-                    {% for error in form.latitude.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
-
-                    {% render_field form.longitude placeholder="Longitude" %}
-                    {% for error in form.longitude.errors %}<p class="error-msg">{{ error }}</p>{% endfor %}
-
                     <button type="submit" class="btn-primary">Salvar Alterações</button>
                     <a href="{{ voltar_url|default:'/veterinarios/painel/' }}" class="back-link">← Voltar ao Painel</a>
                 </div>
@@ -63,6 +57,9 @@
 const inputFoto = document.getElementById('id_foto');
 const preview = document.getElementById('preview');
 if (inputFoto) {
+  // Esconde o input padrão e estiliza
+  inputFoto.style.display = 'none';
+  
   inputFoto.addEventListener('change', function() {
       const file = this.files[0];
       if (!file) return;

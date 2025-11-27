@@ -5,28 +5,40 @@
 <div class="form-card">
     <h2>Editar Animal - {{ animal.nome }}</h2>
 
-    <div class="photo-upload-container">
-
-        {% if animal.foto %}
-            <img id="preview" src="{{ animal.foto.url }}" alt="preview" class="photo-preview">
-        {% else %}
-            <img id="preview" src="{% static 'images/default-pet.jpg' %}" alt="preview" class="photo-preview">
-        {% endif %}
-
-        <label class="upload-btn">
-            Trocar Foto
-            {{ form.foto }}
-        </label>
-    </div>
-
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
+
+        <div class="photo-upload-container">
+            {% if animal.foto %}
+                <img id="preview" src="{{ animal.foto.url }}" alt="preview" class="photo-preview">
+            {% else %}
+                <img id="preview" src="{% static 'images/default-pet.jpg' %}" alt="preview" class="photo-preview">
+            {% endif %}
+
+            <label class="upload-btn" for="id_foto">
+                Trocar Foto
+            </label>
+            {{ form.foto }}
+            {% if form.foto.errors %}
+                <div class="error-msg" style="color: red; margin-top: 5px;">{{ form.foto.errors }}</div>
+            {% endif %}
+        </div>
 
         <div class="form-row">
             <div class="fields-col">
 
+                {% if form.errors %}
+                    <div class="error-messages" style="color: red; margin-bottom: 15px;">
+                        <strong>Erros no formulário:</strong>
+                        {{ form.errors }}
+                    </div>
+                {% endif %}
+
                 <label>Nome</label>
                 {{ form.nome }}
+                {% if form.nome.errors %}
+                    <div class="error-msg">{{ form.nome.errors }}</div>
+                {% endif %}
 
                 <label>Espécie</label>
                 {{ form.especie }}
@@ -58,11 +70,15 @@
     </form>
 </div>
 
-<script>
-    const inputFoto = document.getElementById('{{ form.foto.id_for_label }}');
+    <script>
+    // Preview da foto
+    const inputFoto = document.getElementById('id_foto') || document.querySelector('input[name="foto"]');
     const preview = document.getElementById('preview');
 
     if (inputFoto) {
+        // Esconde o input padrão do Django e estiliza
+        inputFoto.style.display = 'none';
+        
         inputFoto.addEventListener('change', e => {
             const file = e.target.files[0];
             if (!file) return;
@@ -73,6 +89,83 @@
             };
             reader.readAsDataURL(file);
         });
+    }
+
+    // Atualização dinâmica de raças baseado na espécie
+    const racasPorEspecie = {
+        'cachorro': [
+            { value: '', text: 'Selecione a raça' },
+            { value: 'labrador', text: 'Labrador' },
+            { value: 'poodle', text: 'Poodle' },
+            { value: 'bulldog', text: 'Bulldog' },
+            { value: 'vira_lata', text: 'Vira-lata' },
+            { value: 'outro', text: 'Outro' }
+        ],
+        'gato': [
+            { value: '', text: 'Selecione a raça' },
+            { value: 'persa', text: 'Persa' },
+            { value: 'siames', text: 'Siames' },
+            { value: 'maine_coon', text: 'Maine coon' },
+            { value: 'vira_lata', text: 'Vira-lata' },
+            { value: 'outro', text: 'Outro' }
+        ],
+        'passaro': [
+            { value: '', text: 'Selecione a raça' },
+            { value: 'canario', text: 'Canario' },
+            { value: 'calopsita', text: 'Calopsita' },
+            { value: 'periquito', text: 'Periquito' },
+            { value: 'outro', text: 'Outro' }
+        ],
+        'outro': [
+            { value: '', text: 'Selecione a raça' },
+            { value: 'outro', text: 'Outro' }
+        ]
+    };
+
+    // Encontra os campos de espécie e raça (tenta por ID primeiro, depois por name)
+    const especieSelect = document.getElementById('id_especie') || document.querySelector('select[name="especie"]');
+    const racaSelect = document.getElementById('id_raca') || document.querySelector('select[name="raca"]');
+
+    if (especieSelect && racaSelect) {
+        // Salva a raça atual antes de atualizar
+        const racaAtual = racaSelect.value;
+        
+        // Função para atualizar as opções de raça
+        function atualizarRacas() {
+            const especieSelecionada = especieSelect.value;
+            const racaAnterior = racaSelect.value;
+            
+            // Limpa as opções atuais
+            racaSelect.innerHTML = '';
+            
+            // Obtém as raças para a espécie selecionada
+            const racas = racasPorEspecie[especieSelecionada] || racasPorEspecie['outro'];
+            
+            // Adiciona as novas opções
+            racas.forEach(raca => {
+                const option = document.createElement('option');
+                option.value = raca.value;
+                option.textContent = raca.text;
+                racaSelect.appendChild(option);
+            });
+            
+            // Tenta restaurar a raça anterior se ela existir nas novas opções
+            if (racaAnterior && racas.some(r => r.value === racaAnterior)) {
+                racaSelect.value = racaAnterior;
+            }
+        }
+        
+        // Atualiza quando a espécie muda
+        especieSelect.addEventListener('change', atualizarRacas);
+        
+        // Atualiza na carga inicial se já houver uma espécie selecionada
+        if (especieSelect.value) {
+            atualizarRacas();
+            // Restaura a raça atual após atualizar
+            if (racaAtual) {
+                racaSelect.value = racaAtual;
+            }
+        }
     }
 </script>
 

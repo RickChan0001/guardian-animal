@@ -19,13 +19,13 @@
         <div class="form-group">
             <label for="id_especialidade">Especialidade</label>
             <input type="text" name="especialidade" id="id_especialidade"
-                   value="{{ veterinario.especialidade }}" class="form-control">
+                   value="{{ form.especialidade.value|default:veterinario.especialidade }}" class="form-control">
         </div>
 
         <div class="form-group">
             <label for="id_telefone">Telefone</label>
             <input type="text" name="telefone" id="id_telefone"
-                   value="{{ veterinario.telefone }}" class="form-control">
+                   value="{{ form.telefone.value|default:veterinario.telefone }}" class="form-control">
         </div>
 
         <button type="submit" class="btn-submit">Salvar Alterações</button>

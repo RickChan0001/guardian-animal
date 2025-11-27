@@ -11,19 +11,9 @@
             <div class="form-row">
                 <div class="fields-col">
 
-                    {% render_field form.username placeholder="Nome de usuário" %}
-                    {% if form.username.errors %}
-                        <div class="error-msg">{{ form.username.errors }}</div>
-                    {% endif %}
-
                     {% render_field form.first_name placeholder="Nome" %}
                     {% if form.first_name.errors %}
                         <div class="error-msg">{{ form.first_name.errors }}</div>
-                    {% endif %}
-
-                    {% render_field form.last_name placeholder="Sobrenome" %}
-                    {% if form.last_name.errors %}
-                        <div class="error-msg">{{ form.last_name.errors }}</div>
                     {% endif %}
 
                     {% render_field form.email placeholder="E-mail" %}

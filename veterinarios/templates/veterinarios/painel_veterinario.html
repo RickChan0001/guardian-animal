@@ -1,47 +1,268 @@
 {% extends 'base.html' %}
-{% block title %}Perfil do Veterinário{% endblock %}
+{% load static %}
+{% block title %}Painel do Veterinário{% endblock %}
 
 {% block content %}
-<div class="form-container">
 
-    <h2>Meu Perfil 🩺</h2>
+<link rel="stylesheet" href="{% static 'css/painel.css' %}">
 
-    <a href="{% url 'veterinarios:painel_veterinario' %}" class="back-link">← Voltar ao Painel</a>
+<div class="dashboard-container">
 
-    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
-        <h3>Dados Pessoais</h3>
+    <h2 class="dashboard-title">
+        Bem-vindo, Dr(a). {{ veterinario_perfil.usuario.first_name }} 🩺
+    </h2>
 
-        <p><strong>Nome:</strong> {{ veterinario_perfil.usuario.first_name }} {{ veterinario_perfil.usuario.last_name }}</p>
-        <p><strong>Usuário:</strong> {{ veterinario_perfil.usuario.username }}</p>
-        <p><strong>Email:</strong> {{ veterinario_perfil.usuario.email }}</p>
+    <div class="dashboard-actions">
+        <a href="{% url 'veterinarios:perfil_veterinario' %}" class="btn-primary">
+            Meu Perfil
+        </a>
 
-        <p><strong>CRMV:</strong> {{ veterinario_perfil.crmv }}</p>
-
-        <p><strong>Especialidade:</strong>
-            {% if veterinario_perfil.especialidade %}
-                {{ veterinario_perfil.especialidade }}
-            {% else %}
-                Não informado
-            {% endif %}
-        </p>
-
-        <p><strong>Telefone:</strong>
-            {% if veterinario_perfil.telefone %}
-                {{ veterinario_perfil.telefone }}
-            {% else %}
-                Não informado
-            {% endif %}
-        </p>
+        <a href="{% url 'veterinarios:cadastro_clinica' %}" class="btn-success">
+            + Cadastrar Clínica
+        </a>
     </div>
 
-    <div style="text-align: center; margin-top: 30px;">
-        <a href="{% url 'veterinarios:editar_perfil_veterinario' %}" class="btn btn-primary">Editar Perfil</a>
+    <h3 class="section-subtitle">Minhas Clínicas</h3>
 
-        <form method="post" action="{% url 'logout' %}" style="display:inline-block; margin-left:10px;">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger">Sair</button>
-        </form>
+    <div class="clinicas-list">
+
+        {% if clinicas %}
+            {% for clinica in clinicas %}
+            <div class="clinica-card">
+                <div class="clinica-actions">
+                    <a href="{% url 'veterinarios:editar_clinica' clinica.id %}" class="icon-btn edit" title="Editar">
+                        <i class="fas fa-pencil-alt"></i>
+                    </a>
+
+                    <a href="{% url 'veterinarios:delete_clinica' clinica.id %}"
+                       class="icon-btn delete"
+                       title="Deletar"
+                       onclick="return confirm('Tem certeza que deseja deletar esta clínica?');">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                </div>
+
+                <div class="clinica-header">
+                    <h4 class="clinica-name">{{ clinica.nome }}</h4>
+                </div>
+
+                <div class="clinica-info">
+                    {% if clinica.foto %}
+                    <img src="{{ clinica.foto.url }}" alt="{{ clinica.nome }}" class="clinica-photo">
+                    {% else %}
+                    <div class="clinica-photo-placeholder">
+                        <i class="fas fa-hospital" style="font-size: 48px; color: #ccc;"></i>
+                    </div>
+                    {% endif %}
+
+                    {% if clinica.cnpj %}
+                    <p><strong>CNPJ:</strong> {{ clinica.cnpj }}</p>
+                    {% endif %}
+
+                    <p><strong>Endereço:</strong>
+                        {% if clinica.rua %}
+                            {{ clinica.rua }}{% if clinica.numero %}, {{ clinica.numero }}{% endif %}
+                            {% if clinica.bairro %} - {{ clinica.bairro }}{% endif %}
+                        {% else %}
+                            Não informado
+                        {% endif %}
+                    </p>
+
+                    {% if clinica.telefone %}
+                    <p><strong>Telefone:</strong> {{ clinica.telefone }}</p>
+                    {% else %}
+                    <p><strong>Telefone:</strong> Não informado</p>
+                    {% endif %}
+
+                    {% if clinica.observacoes %}
+                    <p><strong>Observações:</strong> {{ clinica.observacoes }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <p>Você ainda não possui clínicas cadastradas.</p>
+                <a href="{% url 'veterinarios:cadastro_clinica' %}" class="btn-primary">
+                    Cadastrar Primeira Clínica
+                </a>
+            </div>
+        {% endif %}
+
     </div>
 
 </div>
+
+<style>
+.dashboard-container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 25px;
+}
+
+.dashboard-title {
+    font-size: 28px;
+    text-align: center;
+    margin-bottom: 30px;
+    color: var(--azul-escuro);
+}
+
+.dashboard-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.btn-primary, .btn-success {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    color: #fff;
+    cursor: pointer;
+    border: none;
+    display: inline-block;
+}
+
+.btn-primary {
+    background-color: var(--azul);
+}
+
+.btn-primary:hover {
+    background-color: var(--azul-escuro);
+}
+
+.btn-success {
+    background-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+.section-subtitle {
+    font-size: 22px;
+    margin-bottom: 20px;
+    color: var(--azul);
+    text-align: center;
+}
+
+.clinicas-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.clinica-card {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.clinica-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.12);
+}
+
+.clinica-actions {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.icon-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #fff;
+    font-size: 14px;
+    transition: transform 0.2s;
+}
+
+.icon-btn:hover {
+    transform: scale(1.1);
+}
+
+.icon-btn.edit {
+    background-color: var(--azul);
+}
+
+.icon-btn.edit:hover {
+    background-color: var(--azul-escuro);
+}
+
+.icon-btn.delete {
+    background-color: #dc3545;
+}
+
+.icon-btn.delete:hover {
+    background-color: #b52a37;
+}
+
+.clinica-header {
+    margin-bottom: 15px;
+    padding-right: 80px;
+}
+
+.clinica-name {
+    font-size: 20px;
+    color: var(--azul-escuro);
+    margin: 0;
+}
+
+.clinica-info {
+    color: #555;
+}
+
+.clinica-info p {
+    margin: 8px 0;
+    line-height: 1.6;
+}
+
+.clinica-photo {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.clinica-photo-placeholder {
+    width: 100%;
+    height: 200px;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    grid-column: 1 / -1;
+}
+
+.empty-state p {
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 20px;
+}
+</style>
+
 {% endblock %}

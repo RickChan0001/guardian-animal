@@ -13,8 +13,14 @@ class CadastroTutorForm(UserCreationForm):
 
     class Meta:
         model = CustomUser
-        fields = ('username', 'first_name', 'last_name', 'email',
+        fields = ('first_name', 'email',
                 'telefone', 'cpf', 'password1', 'password2')
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Remove o campo username do formulário
+        if 'username' in self.fields:
+            del self.fields['username']
 
     def clean_cpf(self):
         cpf = self.cleaned_data.get('cpf')
@@ -67,7 +73,7 @@ class CadastroAnimalForm(forms.ModelForm):
     class Meta:
         model = Animal
         fields = ['nome', 'especie', 'raca', 'idade', 'peso',
-            'altura', 'microchip', 'observacoes', 'foto']
+            'altura', 'observacoes', 'foto']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -91,17 +97,6 @@ class CadastroAnimalForm(forms.ModelForm):
         choices = [(r, r.replace('_', ' ').capitalize()) for r in racas[especie]]
         choices.insert(0, ('', 'Selecione a raça'))
         return choices
-
-    def clean_microchip(self):
-        microchip = self.cleaned_data.get('microchip')
-        if microchip:
-            digits = microchip.replace(' ', '').replace('-', '')
-            if not digits.isdigit():
-                raise ValidationError("Microchip deve conter apenas números.")
-            if len(digits) != 15:
-                raise ValidationError("Microchip deve ter 15 dígitos.")
-            return digits
-        return microchip
 
 class PetHistoryForm(forms.ModelForm):
     class Meta:

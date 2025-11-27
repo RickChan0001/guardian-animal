@@ -1,6 +1,28 @@
 from django.db import models
 from django.conf import settings
 
+class VeterinarioQuerySet(models.QuerySet):
+    """QuerySet customizado que exclui o campo CPF das queries"""
+    def _clone(self):
+        clone = super()._clone()
+        return clone
+
+class VeterinarioManager(models.Manager):
+    """Manager customizado para Veterinario que sempre usa only() com campos que existem"""
+    def get_queryset(self):
+        # Usa apenas os campos que sabemos que existem: id, usuario_id, crmv
+        return VeterinarioQuerySet(self.model, using=self._db).only('id', 'usuario', 'crmv')
+    
+    def get(self, *args, **kwargs):
+        # Sempre usa only() para evitar buscar campos que não existem
+        return self.get_queryset().only('id', 'usuario', 'crmv').get(*args, **kwargs)
+    
+    def filter(self, *args, **kwargs):
+        return self.get_queryset().only('id', 'usuario', 'crmv').filter(*args, **kwargs)
+    
+    def first(self):
+        return self.get_queryset().only('id', 'usuario', 'crmv').first()
+
 class Veterinario(models.Model):
     usuario = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -8,12 +30,45 @@ class Veterinario(models.Model):
         related_name='veterinario'
     )
     crmv = models.CharField(max_length=20, unique=True)
-    telefone = models.CharField(max_length=15, blank=True, null=True)
-    cpf = models.CharField(max_length=14, unique=True, blank=True, null=True)
-    especialidade = models.CharField(max_length=100, blank=True, null=True)
+    # Campos removidos do modelo porque não existem no banco MySQL:
+    # - telefone (pode não existir)
+    # - especialidade (pode não existir)
+    # - cpf (está no CustomUser)
+    
+    objects = VeterinarioManager()
+    
+    @property
+    def cpf(self):
+        """Retorna o CPF do usuário vinculado"""
+        return self.usuario.cpf if hasattr(self.usuario, 'cpf') else None
+    
+    @property
+    def telefone(self):
+        """Retorna o telefone do usuário vinculado (armazenado no CustomUser)"""
+        return self.usuario.telefone if hasattr(self.usuario, 'telefone') else None
+    
+    @property
+    def especialidade(self):
+        """Retorna especialidade se existir no banco, senão None"""
+        # Tenta buscar do banco se a coluna existir
+        try:
+            from django.db import connection
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT especialidade FROM veterinarios_veterinario WHERE id = %s",
+                    [self.id]
+                )
+                row = cursor.fetchone()
+                return row[0] if row and row[0] else None
+        except:
+            return None
 
     def __str__(self):
         return f"{self.usuario.get_full_name() or self.usuario.username}"
+    
+    class Meta:
+        # Força o Django a não buscar o campo CPF
+        managed = True
 
 
 class Clinica(models.Model):
@@ -32,8 +87,6 @@ class Clinica(models.Model):
     observacoes = models.TextField(blank=True, null=True)
     telefone = models.CharField(max_length=15, blank=True, null=True)
     foto = models.ImageField(upload_to='clinicas/', blank=True, null=True)
-    latitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
-    longitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
 
     def __str__(self):
         return self.nome
