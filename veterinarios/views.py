@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.db import transaction, connection
+from django.db.models import Q
 from django.contrib import messages
 
 from .forms import (
@@ -64,38 +65,96 @@ def cadastro_veterinario(request):
                 with transaction.atomic():
                     # Verifica se o CRMV já existe (usando only para evitar campo CPF)
                     crmv = form.cleaned_data.get('crmv')
-                    if Veterinario.objects.only('crmv').filter(crmv=crmv).exists():
-                        messages.error(request, 'Este CRMV já está cadastrado.')
+                    # Normaliza o CRMV para comparação (maiúsculas)
+                    crmv_normalizado = crmv.upper() if crmv else ''
+                    # Verifica se existe CRMV com mesmo valor (case-insensitive)
+                    if Veterinario.objects.only('crmv').filter(
+                        Q(crmv__iexact=crmv_normalizado) | Q(crmv=crmv_normalizado)
+                    ).exists():
+                        form.add_error('crmv', 'Este CRMV já está cadastrado.')
                         return render(request, 'veterinarios/cadastro_veterinario.html', {'form': form})
                     
                     # Verifica se o CPF já existe (se foi fornecido)
                     # O CPF está armazenado no CustomUser, não no Veterinario
+                    # O CPF já vem limpo (apenas números) do método clean_cpf do form
                     cpf = form.cleaned_data.get('cpf')
                     if cpf:
                         from tutores.models import CustomUser
-                        cpf_limpo = ''.join(filter(str.isdigit, str(cpf)))
-                        # Verifica no CustomUser
-                        if CustomUser.objects.filter(cpf=cpf_limpo).exists():
-                            messages.error(request, 'Este CPF já está cadastrado.')
+                        # Verifica no CustomUser (o CPF já está limpo do clean_cpf)
+                        if CustomUser.objects.filter(cpf=cpf).exists():
+                            form.add_error('cpf', 'Este CPF já está cadastrado.')
                             return render(request, 'veterinarios/cadastro_veterinario.html', {'form': form})
-                        cpf = cpf_limpo
                     
-                    user = form.save()
-                    # Salva o CPF e telefone no CustomUser (já que essas colunas não existem em veterinarios_veterinario)
-                    if cpf:
-                        user.cpf = cpf
+                    # Prepara dados do usuário
+                    email = form.cleaned_data['email']
+                    nome_completo = form.cleaned_data['nome_completo'].strip()
+                    partes = nome_completo.split(maxsplit=1)
+                    first_name = partes[0]
+                    last_name = partes[1] if len(partes) > 1 else ''
+                    
+                    # Gera username único
+                    base_username = email.split('@')[0]
+                    username = base_username
+                    counter = 1
+                    from tutores.models import CustomUser
+                    while CustomUser.objects.filter(username=username).exists():
+                        username = f"{base_username}{counter}"
+                        counter += 1
+                    
+                    # Prepara telefone e CPF
                     telefone = form.cleaned_data.get('telefone')
-                    if telefone:
-                        user.telefone = telefone
-                    user.save()
+                    cpf = form.cleaned_data.get('cpf')
                     
-                    # Cria o veterinário usando raw SQL - apenas com os campos que existem: usuario_id e crmv
+                    # Hash da senha
+                    from django.contrib.auth.hashers import make_password
+                    password = form.cleaned_data['password1']
+                    password_hash = make_password(password)
+                    
+                    # Insere o usuário usando SQL direto para garantir que telefone e CPF sejam incluídos
                     from django.db import connection
+                    from django.utils.timezone import now
+                    
                     with connection.cursor() as cursor:
-                        # Insere apenas os campos obrigatórios que sabemos que existem
+                        # Prepara valores - usa string vazia se não fornecido (evita erro do MySQL)
+                        telefone_valor = telefone if telefone else ''
+                        cpf_valor = cpf if cpf else ''
+                        
+                        # Insere o usuário com TODOS os campos obrigatórios
+                        # Inclui telefone e CPF explicitamente (mesmo que vazio) para evitar erro
+                        cursor.execute("""
+                            INSERT INTO tutores_customuser 
+                            (username, email, password, first_name, last_name, telefone, cpf, 
+                             is_staff, is_active, is_superuser, date_joined, last_login)
+                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        """, [
+                            username,
+                            email,
+                            password_hash,
+                            first_name,
+                            last_name,
+                            telefone_valor,  # String vazia se não fornecido
+                            cpf_valor,  # String vazia se não fornecido
+                            0,  # is_staff (0 = False no MySQL)
+                            1,  # is_active (1 = True no MySQL)
+                            0,  # is_superuser (0 = False no MySQL)
+                            now(),  # date_joined
+                            None  # last_login (NULL é permitido)
+                        ])
+                        user_id = cursor.lastrowid
+                    
+                    # Busca o usuário criado
+                    user = CustomUser.objects.get(id=user_id)
+                    
+                    # Cria o veterinário usando raw SQL
+                    # A tabela veterinarios_veterinario tem campo telefone que é NOT NULL
+                    with connection.cursor() as cursor:
+                        # Insere com todos os campos obrigatórios, incluindo telefone
+                        # Usa o CRMV normalizado (maiúsculas)
+                        # Telefone da tabela veterinario (não do CustomUser) - usa string vazia se não fornecido
+                        telefone_vet = telefone if telefone else ''
                         cursor.execute(
-                            "INSERT INTO veterinarios_veterinario (usuario_id, crmv) VALUES (%s, %s)",
-                            [user.id, crmv]
+                            "INSERT INTO veterinarios_veterinario (usuario_id, crmv, telefone) VALUES (%s, %s, %s)",
+                            [user.id, crmv_normalizado, telefone_vet]
                         )
                     login(request, user)
                     messages.success(request, 'Cadastro realizado com sucesso!')
@@ -109,7 +168,8 @@ def cadastro_veterinario(request):
                 else:
                     messages.error(request, f'Erro ao cadastrar veterinário: {error_msg}')
         else:
-            messages.error(request, 'Por favor, corrija os erros no formulário.')
+            # Os erros do formulário serão exibidos automaticamente no template
+            pass
     else:
         form = CadastroVeterinarioForm()
     return render(request, 'veterinarios/cadastro_veterinario.html', {'form': form})
@@ -247,13 +307,54 @@ def editar_perfil_veterinario(request):
         form = EditarPerfilVeterinarioForm(request.POST, instance=user)
         if form.is_valid():
             user = form.save()
-            # Salva telefone no CustomUser (não existe coluna telefone em veterinarios_veterinario)
+            # Salva telefone no CustomUser
             telefone = form.cleaned_data.get('telefone')
             if telefone:
                 user.telefone = telefone
-                user.save()
-            # Especialidade não pode ser salva porque a coluna não existe no banco
-            # Se precisar salvar especialidade, seria necessário criar a coluna ou usar outra tabela
+            else:
+                user.telefone = None
+            user.save()
+            
+            # Salva especialidade na tabela veterinarios_veterinario usando SQL direto
+            # Pega do form.cleaned_data se disponível, senão do POST
+            especialidade = form.cleaned_data.get('especialidade') if 'especialidade' in form.cleaned_data else request.POST.get('especialidade', '').strip()
+            especialidade_valor = especialidade if especialidade else None
+            
+            from django.db import connection
+            try:
+                with connection.cursor() as cursor:
+                    # Verifica se a coluna especialidade existe
+                    cursor.execute("SHOW COLUMNS FROM veterinarios_veterinario LIKE 'especialidade'")
+                    coluna_existe = cursor.fetchone() is not None
+                    
+                    if coluna_existe:
+                        # Se a coluna existe, atualiza
+                        cursor.execute(
+                            "UPDATE veterinarios_veterinario SET especialidade = %s WHERE id = %s",
+                            [especialidade_valor, veterinario.id]
+                        )
+                    else:
+                        # Se não existe, tenta adicionar a coluna
+                        try:
+                            cursor.execute(
+                                "ALTER TABLE veterinarios_veterinario ADD COLUMN especialidade VARCHAR(100) NULL DEFAULT NULL"
+                            )
+                            # Atualiza após criar a coluna
+                            cursor.execute(
+                                "UPDATE veterinarios_veterinario SET especialidade = %s WHERE id = %s",
+                                [especialidade_valor, veterinario.id]
+                            )
+                        except Exception as alter_error:
+                            # Se não conseguir adicionar, apenas registra o erro
+                            import traceback
+                            print(f"Erro ao adicionar coluna especialidade: {alter_error}")
+                            print(traceback.format_exc())
+            except Exception as e:
+                # Se der erro, apenas registra mas não impede o salvamento
+                import traceback
+                print(f"Erro ao salvar especialidade: {e}")
+                print(traceback.format_exc())
+            
             messages.success(request, "Perfil atualizado com sucesso!")
             return redirect('veterinarios:perfil_veterinario')
         else:

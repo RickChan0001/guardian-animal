@@ -28,8 +28,18 @@ class CadastroVeterinarioForm(UserCreationForm):
 
     def clean_crmv(self):
         crmv = self.cleaned_data.get('crmv')
-        if not crmv.isdigit():
-            raise forms.ValidationError("CRMV deve conter apenas números.")
+        if not crmv:
+            raise forms.ValidationError("CRMV é obrigatório.")
+        # Remove espaços e converte para maiúsculas
+        crmv = crmv.strip().upper()
+        # CRMV pode ter formato: números, letras, hífen (ex: 12345-SP, ABC1234-RJ)
+        # Remove hífen para validação
+        crmv_sem_hifen = crmv.replace('-', '')
+        # Verifica se contém apenas letras e números
+        if not crmv_sem_hifen.isalnum():
+            raise forms.ValidationError("CRMV deve conter apenas letras, números e hífen (ex: 12345-SP).")
+        if len(crmv_sem_hifen) < 3:
+            raise forms.ValidationError("CRMV deve ter pelo menos 3 caracteres.")
         return crmv
 
     def clean_cpf(self):
@@ -107,6 +117,11 @@ class CadastroVeterinarioForm(UserCreationForm):
         user.email = email
         user.first_name = partes[0]
         user.last_name = partes[1] if len(partes) > 1 else ''
+        # Define telefone e CPF ANTES do save para garantir que sejam incluídos no INSERT
+        telefone = self.cleaned_data.get('telefone')
+        user.telefone = telefone if telefone else ''
+        cpf = self.cleaned_data.get('cpf')
+        user.cpf = cpf if cpf else ''
         if commit:
             user.save()
         return user

@@ -11,51 +11,108 @@
             <div class="form-row">
                 <div class="fields-col">
 
-                    {% if form.errors %}
-                        <div class="error-messages" style="color: red; margin-bottom: 15px;">
-                            <strong>Erros no formulário:</strong>
-                            {{ form.errors }}
+                    {% if form.non_field_errors %}
+                        <div class="error-messages">
+                            {% for error in form.non_field_errors %}
+                                <div class="error-item">{{ error }}</div>
+                            {% endfor %}
                         </div>
                     {% endif %}
 
+                    <label for="{{ form.nome_completo.id_for_label }}">
+                        Nome completo <span class="required">*</span>
+                    </label>
                     {% render_field form.nome_completo placeholder="Nome completo" %}
                     {% if form.nome_completo.errors %}
-                        <div class="error-msg">{{ form.nome_completo.errors }}</div>
+                        <div class="error-msg">
+                            {% for error in form.nome_completo.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
                     {% endif %}
 
+                    <label for="{{ form.email.id_for_label }}">
+                        E-mail <span class="required">*</span>
+                    </label>
                     {% render_field form.email placeholder="E-mail" %}
                     {% if form.email.errors %}
-                        <div class="error-msg">{{ form.email.errors }}</div>
+                        <div class="error-msg">
+                            {% for error in form.email.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
                     {% endif %}
 
-                    {% render_field form.cpf placeholder="CPF (opcional)" %}
+                    <label for="{{ form.cpf.id_for_label }}">
+                        CPF/CNPJ <span class="optional">(opcional)</span>
+                    </label>
+                    {% render_field form.cpf placeholder="CPF ou CNPJ (opcional)" %}
                     {% if form.cpf.errors %}
-                        <div class="error-msg">{{ form.cpf.errors }}</div>
+                        <div class="error-msg">
+                            {% for error in form.cpf.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
                     {% endif %}
 
-                    {% render_field form.crmv placeholder="CRMV" %}
+                    <label for="{{ form.crmv.id_for_label }}">
+                        CRMV <span class="required">*</span>
+                    </label>
+                    {% render_field form.crmv placeholder="CRMV (ex: 12345-SP)" %}
                     {% if form.crmv.errors %}
-                        <div class="error-msg">{{ form.crmv.errors }}</div>
+                        <div class="error-msg">
+                            {% for error in form.crmv.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
                     {% endif %}
 
-                    {% render_field form.telefone placeholder="Telefone" %}
+                    <label for="{{ form.telefone.id_for_label }}">
+                        Telefone <span class="optional">(opcional)</span>
+                    </label>
+                    {% render_field form.telefone placeholder="Telefone (opcional)" %}
                     {% if form.telefone.errors %}
-                        <div class="error-msg">{{ form.telefone.errors }}</div>
+                        <div class="error-msg">
+                            {% for error in form.telefone.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
                     {% endif %}
 
+                    <label for="{{ form.especialidade.id_for_label }}">
+                        Especialidade <span class="optional">(opcional)</span>
+                    </label>
                     {% render_field form.especialidade placeholder="Especialidade (opcional)" %}
                     {% if form.especialidade.errors %}
-                        <div class="error-msg">{{ form.especialidade.errors }}</div>
+                        <div class="error-msg">
+                            {% for error in form.especialidade.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
                     {% endif %}
 
+                    <label for="{{ form.password1.id_for_label }}">
+                        Senha <span class="required">*</span>
+                    </label>
                     {% render_field form.password1 placeholder="Senha" %}
                     {% if form.password1.errors %}
-                        <div class="error-msg">{{ form.password1.errors }}</div>
+                        <div class="error-msg">
+                            {% for error in form.password1.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
                     {% endif %}
 
+                    <label for="{{ form.password2.id_for_label }}">
+                        Confirmar senha <span class="required">*</span>
+                    </label>
                     {% render_field form.password2 placeholder="Confirmar senha" %}
                     {% if form.password2.errors %}
-                        <div class="error-msg">{{ form.password2.errors }}</div>
+                        <div class="error-msg">
+                            {% for error in form.password2.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
                     {% endif %}
 
                     <button type="submit" class="btn-primary">Cadastrar</button>
@@ -73,11 +130,70 @@
 </div>
 
 <style>
+label {
+    display: block;
+    margin-top: 12px;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: var(--text-primary);
+    text-align: left;
+}
+
+label:first-child {
+    margin-top: 0;
+}
+
+.required {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.optional {
+    color: #6c757d;
+    font-size: 0.9em;
+    font-weight: normal;
+}
+
+.error-messages {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+    padding: 12px;
+    margin-bottom: 20px;
+    color: #721c24;
+}
+
+.error-messages .error-item {
+    margin: 5px 0;
+}
+
 .error-msg {
     color: #dc3545;
     font-size: 12px;
-    margin-top: -10px;
+    margin-top: 5px;
     margin-bottom: 10px;
+    text-align: left;
+    display: block;
+}
+
+.error-msg span {
+    display: block;
+    margin: 2px 0;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+input.error {
+    border-color: #dc3545;
 }
 </style>
 

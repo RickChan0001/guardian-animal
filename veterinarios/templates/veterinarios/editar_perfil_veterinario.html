@@ -17,15 +17,27 @@
         <div class="form-group">{% render_field form.email placeholder="E-mail" %}</div>
 
         <div class="form-group">
-            <label for="id_especialidade">Especialidade</label>
-            <input type="text" name="especialidade" id="id_especialidade"
-                   value="{{ form.especialidade.value|default:veterinario.especialidade }}" class="form-control">
+            <label for="{{ form.especialidade.id_for_label }}">Especialidade</label>
+            {% render_field form.especialidade placeholder="Especialidade (opcional)" %}
+            {% if form.especialidade.errors %}
+                <div class="error-msg">
+                    {% for error in form.especialidade.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
 
         <div class="form-group">
-            <label for="id_telefone">Telefone</label>
-            <input type="text" name="telefone" id="id_telefone"
-                   value="{{ form.telefone.value|default:veterinario.telefone }}" class="form-control">
+            <label for="{{ form.telefone.id_for_label }}">Telefone</label>
+            {% render_field form.telefone placeholder="Telefone (opcional)" %}
+            {% if form.telefone.errors %}
+                <div class="error-msg">
+                    {% for error in form.telefone.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
 
         <button type="submit" class="btn-submit">Salvar Alterações</button>
