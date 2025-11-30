@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<div class="form-container" style="max-width: 1200px; margin: 30px auto; padding: 25px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h2 style="color: var(--azul);">
+            <i class="fas fa-calendar-alt"></i> Consultas Agendadas
+        </h2>
+        <a href="{% url 'veterinarios:cadastrar_consulta' %}" class="btn-primary" style="text-decoration: none; padding: 10px 20px;">
+            <i class="fas fa-plus"></i> Nova Consulta
+        </a>
+    </div>
+
+    {% if consultas %}
+        <div style="display: grid; gap: 20px;">
+            {% for consulta in consultas %}
+            <div class="consulta-card" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 3px 12px rgba(0,0,0,0.1); border-left: 4px solid 
+                {% if consulta.status == 'pending' %}#ffc107
+                {% elif consulta.status == 'confirmed' %}#28a745
+                {% elif consulta.status == 'completed' %}#17a2b8
+                {% elif consulta.status == 'cancelled' %}#dc3545
+                {% else %}#6c757d
+                {% endif %};">
+                
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                    <div>
+                        <h3 style="color: var(--azul); margin-bottom: 5px;">
+                            <i class="fas fa-paw"></i> {{ consulta.animal.nome }}
+                        </h3>
+                        <p style="color: #666; margin: 5px 0;">
+                            <strong>Tutor:</strong> {{ consulta.tutor.usuario.get_full_name|default:consulta.tutor.usuario.first_name }}
+                        </p>
+                        <p style="color: #666; margin: 5px 0;">
+                            <strong>Clínica:</strong> {{ consulta.clinic.nome }}
+                        </p>
+                        {% if consulta.service %}
+                            <p style="color: #666; margin: 5px 0;">
+                                <strong>Serviço:</strong> {{ consulta.service.name }}
+                            </p>
+                        {% endif %}
+                    </div>
+                    <div style="text-align: right;">
+                        <span class="badge" style="padding: 5px 12px; border-radius: 20px; font-size: 14px; background: 
+                            {% if consulta.status == 'pending' %}#ffc107; color: #000;
+                            {% elif consulta.status == 'confirmed' %}#28a745; color: #fff;
+                            {% elif consulta.status == 'completed' %}#17a2b8; color: #fff;
+                            {% elif consulta.status == 'cancelled' %}#dc3545; color: #fff;
+                            {% else %}#6c757d; color: #fff;
+                            {% endif %};">
+                            {{ consulta.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+
+                <div style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 15px;">
+                    <p style="color: #666; margin: 5px 0;">
+                        <i class="fas fa-calendar"></i> <strong>Data:</strong> {{ consulta.date|date:"d/m/Y" }}
+                    </p>
+                    <p style="color: #666; margin: 5px 0;">
+                        <i class="fas fa-clock"></i> <strong>Hora:</strong> {{ consulta.date|date:"H:i" }}
+                    </p>
+                    {% if consulta.notes %}
+                        <p style="color: #666; margin: 10px 0 0 0;">
+                            <strong>Observações:</strong> {{ consulta.notes }}
+                        </p>
+                    {% endif %}
+                </div>
+                
+                <div style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 15px; text-align: right;">
+                    <a href="{% url 'veterinarios:editar_consulta' consulta.id %}" class="btn-primary" style="text-decoration: none; padding: 8px 16px; display: inline-block;">
+                        <i class="fas fa-edit"></i> Editar Consulta
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 40px; background: #f8f9fa; border-radius: 12px;">
+            <i class="fas fa-calendar-times" style="font-size: 48px; color: #ccc; margin-bottom: 15px;"></i>
+            <p style="font-size: 18px; color: #666;">Nenhuma consulta cadastrada</p>
+            <a href="{% url 'veterinarios:cadastrar_consulta' %}" class="btn-primary" style="display: inline-block; margin-top: 15px; text-decoration: none;">
+                Cadastrar Primeira Consulta
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.consulta-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    transition: all 0.3s;
+}
+</style>
+
+{% endblock content %}
+

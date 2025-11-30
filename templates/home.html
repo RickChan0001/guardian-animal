@@ -24,7 +24,7 @@
     {% if user.is_authenticated %}
         <p>Bem-vindo, {{ user.first_name|default:user.username }}!</p>
         <div style="margin-top:15px;">
-            {% if user.tutor %}
+            {% if user_is_tutor %}
                 <a href="{% url 'tutores:painel_tutor' %}" class="btn-primary" style="margin-right:10px;">Meu Painel</a>
             {% elif user.veterinario %}
                 <a href="{% url 'veterinarios:painel_veterinario' %}" class="btn-primary" style="margin-right:10px;">Meu Painel</a>

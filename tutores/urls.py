@@ -11,4 +11,9 @@ urlpatterns = [
     path('perfil/', views.perfil_tutor, name='perfil_tutor'),
     path('animal/<int:animal_id>/', views.animal_profile, name='animal_profile'),
     path('animal/<int:animal_id>/add_history/', views.add_pet_history, name='add_pet_history'),
+    path('buscar_veterinario/', views.buscar_veterinario, name='buscar_veterinario'),
+    path('veterinario/<int:veterinario_id>/', views.perfil_publico_veterinario, name='perfil_publico_veterinario'),
+    path('notificacoes/', views.notificacoes, name='notificacoes'),
+    path('notificacao/<int:notificacao_id>/marcar_lida/', views.marcar_notificacao_lida, name='marcar_notificacao_lida'),
+    path('api/animais/', views.api_animais_por_tutor, name='api_animais_por_tutor'),
 ]

@@ -34,6 +34,9 @@ class Veterinario(models.Model):
     # - telefone (pode não existir)
     # - especialidade (pode não existir)
     # - cpf (está no CustomUser)
+    # Campos adicionais para perfil público
+    formacao = models.TextField(blank=True, null=True, help_text='Formação acadêmica do veterinário')
+    experiencia = models.TextField(blank=True, null=True, help_text='Experiência profissional')
     
     objects = VeterinarioManager()
     
@@ -62,6 +65,36 @@ class Veterinario(models.Model):
                 return row[0] if row and row[0] else None
         except:
             return None
+    
+    @property
+    def formacao(self):
+        """Retorna formacao se existir no banco, senão None"""
+        try:
+            from django.db import connection
+            with connection.cursor() as cursor:
+                cursor.execute("SHOW COLUMNS FROM veterinarios_veterinario LIKE 'formacao'")
+                if cursor.fetchone():
+                    cursor.execute("SELECT formacao FROM veterinarios_veterinario WHERE id = %s", [self.id])
+                    row = cursor.fetchone()
+                    return row[0] if row and row[0] else None
+        except:
+            pass
+        return None
+    
+    @property
+    def experiencia(self):
+        """Retorna experiencia se existir no banco, senão None"""
+        try:
+            from django.db import connection
+            with connection.cursor() as cursor:
+                cursor.execute("SHOW COLUMNS FROM veterinarios_veterinario LIKE 'experiencia'")
+                if cursor.fetchone():
+                    cursor.execute("SELECT experiencia FROM veterinarios_veterinario WHERE id = %s", [self.id])
+                    row = cursor.fetchone()
+                    return row[0] if row and row[0] else None
+        except:
+            pass
+        return None
 
     def __str__(self):
         return f"{self.usuario.get_full_name() or self.usuario.username}"
@@ -87,6 +120,38 @@ class Clinica(models.Model):
     observacoes = models.TextField(blank=True, null=True)
     telefone = models.CharField(max_length=15, blank=True, null=True)
     foto = models.ImageField(upload_to='clinicas/', blank=True, null=True)
+    # Nota: Campos de geolocalização (latitude/longitude) podem não existir na tabela do banco
+    # Se necessário, podem ser adicionados via migração futura
+
+    @property
+    def latitude(self):
+        """Retorna latitude se existir no banco, senão None"""
+        try:
+            from django.db import connection
+            with connection.cursor() as cursor:
+                cursor.execute("SHOW COLUMNS FROM veterinarios_clinica LIKE 'latitude'")
+                if cursor.fetchone():
+                    cursor.execute("SELECT latitude FROM veterinarios_clinica WHERE id = %s", [self.id])
+                    row = cursor.fetchone()
+                    return float(row[0]) if row and row[0] is not None else None
+        except:
+            pass
+        return None
+    
+    @property
+    def longitude(self):
+        """Retorna longitude se existir no banco, senão None"""
+        try:
+            from django.db import connection
+            with connection.cursor() as cursor:
+                cursor.execute("SHOW COLUMNS FROM veterinarios_clinica LIKE 'longitude'")
+                if cursor.fetchone():
+                    cursor.execute("SELECT longitude FROM veterinarios_clinica WHERE id = %s", [self.id])
+                    row = cursor.fetchone()
+                    return float(row[0]) if row and row[0] is not None else None
+        except:
+            pass
+        return None
 
     def __str__(self):
         return self.nome

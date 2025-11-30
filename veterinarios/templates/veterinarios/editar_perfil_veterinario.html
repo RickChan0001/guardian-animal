@@ -40,6 +40,30 @@
             {% endif %}
         </div>
 
+        <div class="form-group">
+            <label for="{{ form.formacao.id_for_label }}">Formação</label>
+            {% render_field form.formacao placeholder="Formação acadêmica (opcional)" %}
+            {% if form.formacao.errors %}
+                <div class="error-msg">
+                    {% for error in form.formacao.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.experiencia.id_for_label }}">Experiência Profissional</label>
+            {% render_field form.experiencia placeholder="Experiência profissional (opcional)" %}
+            {% if form.experiencia.errors %}
+                <div class="error-msg">
+                    {% for error in form.experiencia.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
         <button type="submit" class="btn-submit">Salvar Alterações</button>
     </form>
 

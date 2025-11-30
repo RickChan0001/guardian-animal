@@ -4,6 +4,7 @@
 
 {% block content %}
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" href="{% static 'css/painel.css' %}">
 
 <div class="dashboard-container">
@@ -20,6 +21,14 @@
         <a href="{% url 'veterinarios:cadastro_clinica' %}" class="btn-success">
             + Cadastrar Clínica
         </a>
+
+        <a href="{% url 'veterinarios:listar_consultas' %}" class="btn-primary" style="background-color: #17a2b8;">
+            <i class="fas fa-calendar-alt"></i> Consultas
+        </a>
+
+        <a href="{% url 'veterinarios:cadastrar_consulta' %}" class="btn-success">
+            <i class="fas fa-plus"></i> Nova Consulta
+        </a>
     </div>
 
     <h3 class="section-subtitle">Minhas Clínicas</h3>
@@ -31,14 +40,13 @@
             <div class="clinica-card">
                 <div class="clinica-actions">
                     <a href="{% url 'veterinarios:editar_clinica' clinica.id %}" class="icon-btn edit" title="Editar">
-                        <i class="fas fa-pencil-alt"></i>
+                        <i class="fas fa-pencil"></i>
                     </a>
 
                     <a href="{% url 'veterinarios:delete_clinica' clinica.id %}"
                        class="icon-btn delete"
-                       title="Deletar"
-                       onclick="return confirm('Tem certeza que deseja deletar esta clínica?');">
-                        <i class="fas fa-trash-alt"></i>
+                       title="Deletar">
+                        <i class="fas fa-trash"></i>
                     </a>
                 </div>
 
@@ -179,16 +187,17 @@
 }
 
 .icon-btn {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     text-decoration: none;
     color: #fff;
-    font-size: 14px;
+    font-size: 16px;
     transition: transform 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .icon-btn:hover {

@@ -25,12 +25,29 @@
         </div>
         <nav class="menu">
             {% if user.is_authenticated %}
-                {% if user.tutor %}
+                {% if user_is_tutor %}
                     <a href="{% url 'tutores:painel_tutor' %}">Painel</a>
                     <a href="{% url 'tutores:perfil_tutor' %}">Perfil</a>
+                    <a href="{% url 'tutores:buscar_veterinario' %}">Buscar Clínicas</a>
+                    <a href="{% url 'tutores:notificacoes' %}" style="position: relative;">
+                        Notificações
+                        {% if notificacoes_nao_lidas > 0 %}
+                            <span style="position: absolute; top: -5px; right: -8px; background: #dc3545; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 11px; display: flex; align-items: center; justify-content: center;">
+                                {{ notificacoes_nao_lidas }}
+                            </span>
+                        {% endif %}
+                    </a>
                 {% elif user.veterinario %}
                     <a href="{% url 'veterinarios:painel_veterinario' %}">Painel</a>
                     <a href="{% url 'veterinarios:perfil_veterinario' %}">Perfil</a>
+                    <a href="{% url 'veterinarios:notificacoes_veterinario' %}" style="position: relative;">
+                        Notificações
+                        {% if notificacoes_nao_lidas > 0 %}
+                            <span style="position: absolute; top: -5px; right: -8px; background: #dc3545; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 11px; display: flex; align-items: center; justify-content: center;">
+                                {{ notificacoes_nao_lidas }}
+                            </span>
+                        {% endif %}
+                    </a>
                 {% else %}
                     <a href="/">Home</a>
                 {% endif %}

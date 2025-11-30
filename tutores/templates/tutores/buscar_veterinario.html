@@ -2,64 +2,116 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <h1 class="mb-4">Buscar Clínicas ou Veterinários</h1>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-            <div class="custom-card mb-5 p-4">
-                <form method="GET" action="{% url 'tutores:buscar_veterinario' %}" class="d-flex">
-                    {{ form.termo_busca }}
-                    <button type="submit" class="btn btn-primary ms-3" style="background-color: var(--azul);">
-                        <i class="bi bi-search"></i> Buscar
-                    </button>
-                </form>
-            </div>
+<div class="form-container" style="max-width: 1000px; margin: 30px auto; padding: 25px;">
+    <h2 style="text-align: center; color: var(--azul); margin-bottom: 30px;">
+        <i class="fas fa-search"></i> Buscar Clínicas Veterinárias
+    </h2>
 
-            <h2>Resultados</h2>
-
-            {% if clinicas %}
-                <div class="row">
-                    {% for clinica in clinicas %}
-                        <div class="col-md-6 mb-4">
-                            <div class="custom-card d-flex align-items-center p-4">
-                                
-                                <div class="me-4 text-center">
-                                    <i class="bi bi-hospital-fill" style="font-size: 3rem; color: var(--azul-escuro);"></i>
-                                </div>
-                                
-                                <div>
-                                    <h5 class="mb-1">{{ clinica.nome }}</h5>
-
-                                    <p class="text-muted mb-1">
-                                        {{ clinica.rua }}
-                                        {% if clinica.numero %}, {{ clinica.numero }}{% endif %}
-                                        {% if clinica.bairro %} - {{ clinica.bairro }}{% endif %}
-                                    </p>
-
-                                    {% if clinica.veterinario %}
-                                        <span class="badge bg-secondary me-2">
-                                            Dr(a). {{ clinica.veterinario.usuario.first_name }}
-                                        </span>
-                                    {% endif %}
-
-                                    <span class="badge bg-warning text-dark">4.5 Estrelas</span>
-
-                                    <a href="#" class="btn btn-sm btn-link mt-2 p-0 d-block text-start">
-                                        Ver Detalhes e Agendar &rarr;
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="alert alert-info custom-card">
-                    Nenhuma clínica ou veterinário encontrado. Tente uma nova busca!
-                </div>
-            {% endif %}
-            
+    <form method="GET" action="{% url 'tutores:buscar_veterinario' %}" style="margin-bottom: 30px;">
+        <div style="display: flex; gap: 10px;">
+            <input type="text" 
+                   name="termo_busca" 
+                   value="{{ termo_busca }}" 
+                   placeholder="Digite o nome da clínica, endereço ou veterinário..."
+                   style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px;">
+            <button type="submit" class="btn-primary" style="padding: 12px 24px;">
+                <i class="fas fa-search"></i> Buscar
+            </button>
         </div>
-    </div>
+    </form>
+
+    {% if clinicas %}
+        <h3 style="margin-bottom: 20px; color: var(--azul);">Resultados da Busca</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+            {% for clinica in clinicas %}
+            <div class="clinica-card" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 3px 12px rgba(0,0,0,0.1);">
+                <div style="width: 100%; height: 200px; background: #f0f0f0; border-radius: 8px; margin-bottom: 15px; position: relative; overflow: hidden;">
+                    {% if clinica.foto %}
+                        <img src="{{ clinica.foto.url }}" 
+                             alt="{{ clinica.nome }}" 
+                             style="width: 100%; height: 100%; object-fit: cover;"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    {% endif %}
+                    <div style="width: 100%; height: 100%; display: {% if clinica.foto %}none{% else %}flex{% endif %}; align-items: center; justify-content: center; position: absolute; top: 0; left: 0;">
+                        <i class="fas fa-hospital" style="font-size: 48px; color: #ccc;"></i>
+                    </div>
+                </div>
+                
+                <h4 style="color: var(--azul); margin-bottom: 10px;">{{ clinica.nome }}</h4>
+                
+                {% if clinica.veterinario %}
+                    {% if clinica.veterinario.usuario %}
+                        <p style="margin-bottom: 10px;">
+                            <strong>Veterinário:</strong> 
+                            <a href="{% url 'tutores:perfil_publico_veterinario' clinica.veterinario.id %}" style="color: var(--azul); text-decoration: none;">
+                                Dr(a). 
+                                {% if clinica.veterinario.usuario.get_full_name %}
+                                    {{ clinica.veterinario.usuario.get_full_name }}
+                                {% elif clinica.veterinario.usuario.first_name %}
+                                    {{ clinica.veterinario.usuario.first_name }}{% if clinica.veterinario.usuario.last_name %} {{ clinica.veterinario.usuario.last_name }}{% endif %}
+                                {% else %}
+                                    {{ clinica.veterinario.usuario.username }}
+                                {% endif %}
+                            </a>
+                        </p>
+                    {% else %}
+                        <p style="margin-bottom: 10px; color: #999; font-style: italic;">
+                            Veterinário: ID {{ clinica.veterinario.id }}
+                        </p>
+                    {% endif %}
+                {% else %}
+                    <p style="margin-bottom: 10px; color: #999; font-style: italic;">
+                        Veterinário não informado
+                    </p>
+                {% endif %}
+                
+                <p style="color: #666; margin-bottom: 5px;">
+                    <i class="fas fa-map-marker-alt"></i> 
+                    {% if clinica.rua %}
+                        {{ clinica.rua }}{% if clinica.numero %}, {{ clinica.numero }}{% endif %}
+                        {% if clinica.bairro %} - {{ clinica.bairro }}{% endif %}
+                    {% else %}
+                        Endereço não informado
+                    {% endif %}
+                </p>
+                
+                {% if clinica.telefone %}
+                    <p style="color: #666; margin-bottom: 15px;">
+                        <i class="fas fa-phone"></i> {{ clinica.telefone }}
+                    </p>
+                {% endif %}
+                
+                {% if clinica.veterinario %}
+                    <a href="{% url 'tutores:perfil_publico_veterinario' clinica.veterinario.id %}" class="btn-primary" style="display: block; text-align: center; text-decoration: none; margin-top: 15px;">
+                        Ver Perfil do Veterinário
+                    </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    {% elif termo_busca %}
+        <div style="text-align: center; padding: 40px; background: #f8f9fa; border-radius: 12px;">
+            <i class="fas fa-search" style="font-size: 48px; color: #ccc; margin-bottom: 15px;"></i>
+            <p style="font-size: 18px; color: #666;">Nenhuma clínica encontrada para "{{ termo_busca }}"</p>
+            <p style="color: #999;">Tente buscar por nome, endereço ou veterinário</p>
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 40px; background: #f8f9fa; border-radius: 12px;">
+            <i class="fas fa-search" style="font-size: 48px; color: #ccc; margin-bottom: 15px;"></i>
+            <p style="font-size: 18px; color: #666;">Digite um termo de busca para encontrar clínicas veterinárias</p>
+            <p style="color: #999;">Você pode buscar por nome da clínica, endereço ou nome do veterinário</p>
+        </div>
+    {% endif %}
 </div>
+
+<style>
+.clinica-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    transition: all 0.3s;
+}
+</style>
+
 {% endblock content %}

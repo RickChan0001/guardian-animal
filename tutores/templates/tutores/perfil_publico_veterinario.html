@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<div class="form-container" style="max-width: 900px; margin: 30px auto; padding: 25px;">
+    <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 3px 12px rgba(0,0,0,0.1);">
+        
+        <div style="text-align: center; margin-bottom: 30px;">
+            <div style="width: 120px; height: 120px; background: var(--azul); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-user-md" style="font-size: 60px; color: white;"></i>
+            </div>
+            <h2 style="color: var(--azul); margin-bottom: 10px;">
+                Dr(a). {{ veterinario.usuario.get_full_name|default:veterinario.usuario.first_name }}
+            </h2>
+            <p style="color: #666; font-size: 18px;">CRMV: {{ veterinario.crmv }}</p>
+        </div>
+
+        <div style="border-top: 2px solid #eee; padding-top: 30px; margin-top: 30px;">
+            <h3 style="color: var(--azul); margin-bottom: 20px;">
+                <i class="fas fa-graduation-cap"></i> Formação
+            </h3>
+            {% if veterinario.formacao %}
+                <p style="color: #666; line-height: 1.8; white-space: pre-line;">{{ veterinario.formacao }}</p>
+            {% else %}
+                <p style="color: #999; font-style: italic;">Formação não informada</p>
+            {% endif %}
+        </div>
+
+        <div style="border-top: 2px solid #eee; padding-top: 30px; margin-top: 30px;">
+            <h3 style="color: var(--azul); margin-bottom: 20px;">
+                <i class="fas fa-briefcase"></i> Experiência Profissional
+            </h3>
+            {% if veterinario.experiencia %}
+                <p style="color: #666; line-height: 1.8; white-space: pre-line;">{{ veterinario.experiencia }}</p>
+            {% else %}
+                <p style="color: #999; font-style: italic;">Experiência não informada</p>
+            {% endif %}
+        </div>
+
+        <div style="border-top: 2px solid #eee; padding-top: 30px; margin-top: 30px;">
+            <h3 style="color: var(--azul); margin-bottom: 20px;">
+                <i class="fas fa-stethoscope"></i> Especialidade
+            </h3>
+            {% if veterinario.especialidade %}
+                <p style="color: #666; font-size: 18px;">{{ veterinario.especialidade }}</p>
+            {% else %}
+                <p style="color: #999; font-style: italic;">Especialidade não informada</p>
+            {% endif %}
+        </div>
+
+        {% if clinicas %}
+        <div style="border-top: 2px solid #eee; padding-top: 30px; margin-top: 30px;">
+            <h3 style="color: var(--azul); margin-bottom: 20px;">
+                <i class="fas fa-hospital"></i> Clínicas
+            </h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
+                {% for clinica in clinicas %}
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <h4 style="color: var(--azul); margin-bottom: 10px; font-size: 18px;">{{ clinica.nome }}</h4>
+                    {% if clinica.rua %}
+                        <p style="color: #666; font-size: 14px; margin-bottom: 5px;">
+                            <i class="fas fa-map-marker-alt"></i> 
+                            {{ clinica.rua }}{% if clinica.numero %}, {{ clinica.numero }}{% endif %}
+                            {% if clinica.bairro %} - {{ clinica.bairro }}{% endif %}
+                        </p>
+                    {% endif %}
+                    {% if clinica.telefone %}
+                        <p style="color: #666; font-size: 14px;">
+                            <i class="fas fa-phone"></i> {{ clinica.telefone }}
+                        </p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="{% url 'tutores:buscar_veterinario' %}" class="btn-primary" style="display: inline-block; text-decoration: none;">
+                <i class="fas fa-arrow-left"></i> Voltar para Busca
+            </a>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+

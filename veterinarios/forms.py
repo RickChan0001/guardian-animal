@@ -128,9 +128,11 @@ class CadastroVeterinarioForm(UserCreationForm):
 
 
 class EditarPerfilVeterinarioForm(forms.ModelForm):
-    email = forms.EmailField(required=True, label='E-mail')
+    email = forms.EmailField(required=False, label='E-mail')
     telefone = forms.CharField(max_length=15, required=False, label='Telefone')
     especialidade = forms.CharField(max_length=100, required=False, label='Especialidade')
+    formacao = forms.CharField(widget=forms.Textarea(attrs={'rows': 4}), required=False, label='Formação')
+    experiencia = forms.CharField(widget=forms.Textarea(attrs={'rows': 4}), required=False, label='Experiência Profissional')
 
     class Meta:
         model = User
@@ -158,13 +160,38 @@ class ServiceForm(forms.ModelForm):
 
 
 class AppointmentForm(forms.ModelForm):
+    tutor = forms.ModelChoiceField(
+        queryset=None,
+        label='Tutor',
+        required=True,
+        help_text='Selecione o tutor responsável pelo animal'
+    )
+    
     class Meta:
         model = Appointment
-        fields = ['veterinarian', 'clinic', 'animal', 'service', 'date', 'notes']
+        fields = ['tutor', 'animal', 'clinic', 'service', 'date', 'status', 'notes']
         widgets = {
             'date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            'notes': forms.Textarea(attrs={'rows': 3}),
+            'status': forms.Select(),
+            'notes': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Observações sobre a consulta (opcional)'}),
+            'animal': forms.Select(),
+            'clinic': forms.Select(),
+            'service': forms.Select(),
         }
+
+
+class EditarConsultaForm(forms.ModelForm):
+    """Formulário simplificado para editar consulta (principalmente status)"""
+    class Meta:
+        model = Appointment
+        fields = ['status', 'date', 'notes']
+        widgets = {
+            'date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'status': forms.Select(),
+            'notes': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Observações sobre a consulta (opcional)'}),
+        }
+    
+    # Não precisa de __init__ customizado pois não tem campos dependentes
 
 
 class NotificationForm(forms.ModelForm):

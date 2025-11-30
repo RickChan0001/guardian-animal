@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<div class="form-container" style="max-width: 800px; margin: 30px auto; padding: 25px;">
+    <h2 style="text-align: center; color: var(--azul); margin-bottom: 30px;">
+        <i class="fas fa-calendar-plus"></i> Cadastrar Nova Consulta
+    </h2>
+
+    <a href="{% url 'veterinarios:listar_consultas' %}" class="back-link" style="display: inline-block; margin-bottom: 20px;">
+        ← Voltar para Consultas
+    </a>
+
+    <form method="POST" id="consulta-form">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="{{ form.tutor.id_for_label }}">Tutor <span style="color: red;">*</span></label>
+            {% render_field form.tutor class="form-control" %}
+            {% if form.tutor.errors %}
+                <div class="error-msg">
+                    {% for error in form.tutor.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <small class="form-text text-muted">{{ form.tutor.help_text }}</small>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.animal.id_for_label }}">Animal <span style="color: red;">*</span></label>
+            {% render_field form.animal class="form-control" %}
+            {% if form.animal.errors %}
+                <div class="error-msg">
+                    {% for error in form.animal.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <small class="form-text text-muted" id="animal-help">Selecione primeiro o tutor para carregar os animais</small>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.clinic.id_for_label }}">Clínica <span style="color: red;">*</span></label>
+            {% render_field form.clinic class="form-control" %}
+            {% if form.clinic.errors %}
+                <div class="error-msg">
+                    {% for error in form.clinic.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.service.id_for_label }}">Serviço</label>
+            {% render_field form.service class="form-control" %}
+            {% if form.service.errors %}
+                <div class="error-msg">
+                    {% for error in form.service.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <small class="form-text text-muted">Opcional - Selecione um serviço oferecido pela clínica</small>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.date.id_for_label }}">Data e Hora <span style="color: red;">*</span></label>
+            {% render_field form.date class="form-control" %}
+            {% if form.date.errors %}
+                <div class="error-msg">
+                    {% for error in form.date.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.status.id_for_label }}">Status <span style="color: red;">*</span></label>
+            {% render_field form.status class="form-control" %}
+            {% if form.status.errors %}
+                <div class="error-msg">
+                    {% for error in form.status.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.notes.id_for_label }}">Observações</label>
+            {% render_field form.notes class="form-control" %}
+            {% if form.notes.errors %}
+                <div class="error-msg">
+                    {% for error in form.notes.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn-submit">
+            <i class="fas fa-save"></i> Cadastrar Consulta
+        </button>
+    </form>
+</div>
+
+<script>
+// Atualiza a lista de animais quando o tutor é selecionado
+document.addEventListener('DOMContentLoaded', function() {
+    const tutorSelect = document.getElementById('id_tutor');
+    const animalSelect = document.getElementById('id_animal');
+    
+    if (tutorSelect && animalSelect) {
+        // Função para carregar animais
+        function carregarAnimais(tutorId) {
+            if (!tutorId) {
+                animalSelect.innerHTML = '<option value="">---------</option>';
+                animalSelect.disabled = true;
+                return;
+            }
+            
+            animalSelect.disabled = true;
+            animalSelect.innerHTML = '<option value="">Carregando...</option>';
+            
+            // Faz requisição AJAX para buscar animais do tutor
+            fetch(`/tutores/api/animais/?tutor_id=${tutorId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro na requisição');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    animalSelect.innerHTML = '<option value="">---------</option>';
+                    if (data.animais && data.animais.length > 0) {
+                        data.animais.forEach(animal => {
+                            const option = document.createElement('option');
+                            option.value = animal.id;
+                            option.textContent = animal.nome + (animal.especie ? ' (' + animal.especie + ')' : '');
+                            animalSelect.appendChild(option);
+                        });
+                        animalSelect.disabled = false;
+                        animalSelect.required = true;
+                        const helpText = document.getElementById('animal-help');
+                        if (helpText) helpText.textContent = 'Selecione um animal';
+                    } else {
+                        animalSelect.innerHTML = '<option value="">Nenhum animal encontrado</option>';
+                        animalSelect.disabled = true;
+                        const helpText = document.getElementById('animal-help');
+                        if (helpText) helpText.textContent = 'Este tutor não possui animais cadastrados';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar animais:', error);
+                    animalSelect.innerHTML = '<option value="">Erro ao carregar animais</option>';
+                    animalSelect.disabled = true;
+                });
+        }
+        
+        // Event listener para mudança no tutor
+        tutorSelect.addEventListener('change', function() {
+            carregarAnimais(this.value);
+        });
+        
+        // Carrega animais se já houver um tutor selecionado (em caso de erro no formulário)
+        if (tutorSelect.value) {
+            carregarAnimais(tutorSelect.value);
+        } else {
+            animalSelect.disabled = true;
+            animalSelect.required = false;
+        }
+        
+        // Validação antes de submeter o formulário
+        const form = document.getElementById('consulta-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                if (tutorSelect.value && !animalSelect.value) {
+                    e.preventDefault();
+                    alert('Por favor, selecione um animal do tutor escolhido.');
+                    animalSelect.focus();
+                    return false;
+                }
+            });
+        }
+    }
+});
+</script>
+
+{% endblock %}
+

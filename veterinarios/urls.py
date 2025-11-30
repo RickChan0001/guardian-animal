@@ -12,4 +12,9 @@ urlpatterns = [
     path('delete_clinica/<int:clinica_id>/', views.delete_clinica, name='delete_clinica'),
     path('perfil/', views.perfil_veterinario, name='perfil_veterinario'),
     path('editar_perfil/', views.editar_perfil_veterinario, name='editar_perfil_veterinario'),
+    path('notificacoes/', views.notificacoes_veterinario, name='notificacoes_veterinario'),
+    path('notificacao/<int:notificacao_id>/marcar_lida/', views.marcar_notificacao_lida_veterinario, name='marcar_notificacao_lida_veterinario'),
+    path('cadastrar_consulta/', views.cadastrar_consulta, name='cadastrar_consulta'),
+    path('consultas/', views.listar_consultas, name='listar_consultas'),
+    path('editar_consulta/<int:consulta_id>/', views.editar_consulta, name='editar_consulta'),
 ]

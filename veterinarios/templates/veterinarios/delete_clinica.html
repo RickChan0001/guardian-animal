@@ -24,12 +24,12 @@
         {% endif %}
     </div>
 
-    <form method="POST" style="text-align: center;">
+    <form method="POST" style="text-align: center;" action="{% url 'veterinarios:delete_clinica' clinica.id %}">
         {% csrf_token %}
         <button type="submit" class="btn-danger" style="margin-right: 10px;">
             Sim, Deletar
         </button>
-        <a href="{{ voltar_url|default:'/veterinarios/painel/' }}" class="btn-secondary">
+        <a href="{% url 'veterinarios:painel_veterinario' %}" class="btn-secondary">
             Cancelar
         </a>
     </form>

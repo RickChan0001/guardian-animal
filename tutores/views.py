@@ -3,14 +3,20 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.contrib import messages
+from django.db.models import Q
+from django.http import JsonResponse
+from math import radians, cos, sin, asin, sqrt
 from .forms import CadastroTutorForm, CadastroAnimalForm, EditarPerfilTutorForm
 from .models import Tutor, Animal, CustomUser
+from veterinarios.models import Clinica, Veterinario
 
 def home(request):
     # Se o usuário estiver autenticado, redireciona para o painel apropriado
     if request.user.is_authenticated:
-        if hasattr(request.user, 'tutor'):
+        # Verifica se é tutor usando query segura
+        if Tutor.objects.filter(usuario=request.user).exists():
             return redirect('tutores:painel_tutor')
+        # Verifica se é veterinário
         elif hasattr(request.user, 'veterinario'):
             return redirect('veterinarios:painel_veterinario')
     return render(request, 'home.html')
@@ -28,7 +34,8 @@ def login_view(request):
             login(request, user)
             messages.success(request, f'Bem-vindo, {user.first_name or user.username}!')
             # redireciona conforme tipo de conta
-            if hasattr(user, 'tutor'):
+            # Verifica se é tutor usando query segura (evita buscar campos que não existem)
+            if Tutor.objects.filter(usuario=user).exists():
                 return redirect('tutores:painel_tutor')
             elif hasattr(user, 'veterinario'):
                 return redirect('veterinarios:painel_veterinario')
@@ -247,3 +254,118 @@ def add_pet_history(request, animal_id):
     else:
         form = PetHistoryForm()
     return render(request, 'tutores/add_pet_history.html', {'form': form, 'animal': animal})
+
+
+def calcular_distancia(lat1, lon1, lat2, lon2):
+    """Calcula a distância entre dois pontos usando a fórmula de Haversine"""
+    if not all([lat1, lon1, lat2, lon2]):
+        return None
+    
+    # Raio da Terra em km
+    R = 6371
+    
+    lat1, lon1, lat2, lon2 = map(radians, [float(lat1), float(lon1), float(lat2), float(lon2)])
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    
+    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+    c = 2 * asin(sqrt(a))
+    
+    return R * c
+
+
+@login_required(login_url='/login/')
+def buscar_veterinario(request):
+    """Busca clínicas e veterinários, ordenando por proximidade se houver geolocalização"""
+    termo = request.GET.get('termo_busca', '').strip()
+    from veterinarios.models import Clinica
+    
+    try:
+        if termo:
+            # Busca clínicas pelo nome, endereço ou veterinário
+            # Usa select_related para buscar veterinário e usuário em uma única query
+            clinicas = Clinica.objects.select_related(
+                'veterinario',
+                'veterinario__usuario'
+            ).filter(
+                Q(nome__icontains=termo) |
+                Q(rua__icontains=termo) |
+                Q(bairro__icontains=termo) |
+                Q(veterinario__usuario__first_name__icontains=termo) |
+                Q(veterinario__usuario__last_name__icontains=termo)
+            ).distinct().order_by('nome')
+        else:
+            # Se não há termo, mostra todas as clínicas
+            clinicas = Clinica.objects.select_related(
+                'veterinario',
+                'veterinario__usuario'
+            ).all().order_by('nome')
+    except Exception as e:
+        # Se houver erro, tenta buscar sem select_related
+        messages.warning(request, f'Aviso: Alguns dados podem não estar completos. Erro: {str(e)}')
+        if termo:
+            clinicas = Clinica.objects.filter(
+                Q(nome__icontains=termo) |
+                Q(rua__icontains=termo) |
+                Q(bairro__icontains=termo)
+            ).distinct().order_by('nome')
+        else:
+            clinicas = Clinica.objects.all().order_by('nome')
+    
+    return render(request, 'tutores/buscar_veterinario.html', {
+        'clinicas': clinicas,
+        'termo_busca': termo
+    })
+
+
+@login_required(login_url='/login/')
+def perfil_publico_veterinario(request, veterinario_id):
+    """Exibe o perfil público do veterinário"""
+    veterinario = get_object_or_404(Veterinario, id=veterinario_id)
+    clinicas = []
+    
+    # Busca clínicas do veterinário
+    from veterinarios.views import get_clinicas_do_veterinario
+    clinicas = get_clinicas_do_veterinario(veterinario)
+    
+    return render(request, 'tutores/perfil_publico_veterinario.html', {
+        'veterinario': veterinario,
+        'clinicas': clinicas
+    })
+
+
+@login_required(login_url='/login/')
+def notificacoes(request):
+    """Exibe as notificações do usuário"""
+    from veterinarios.models import Notification
+    notificacoes = Notification.objects.filter(user=request.user).order_by('-created_at')
+    nao_lidas = notificacoes.filter(is_read=False).count()
+    
+    return render(request, 'tutores/notificacoes.html', {
+        'notificacoes': notificacoes,
+        'nao_lidas': nao_lidas
+    })
+
+
+@login_required(login_url='/login/')
+def marcar_notificacao_lida(request, notificacao_id):
+    """Marca uma notificação como lida"""
+    from veterinarios.models import Notification
+    notificacao = get_object_or_404(Notification, id=notificacao_id, user=request.user)
+    notificacao.is_read = True
+    notificacao.save()
+    return redirect('tutores:notificacoes')
+
+
+def api_animais_por_tutor(request):
+    """API para retornar animais de um tutor (usado no formulário de consulta)"""
+    tutor_id = request.GET.get('tutor_id')
+    if not tutor_id:
+        return JsonResponse({'animais': []})
+    
+    try:
+        tutor = Tutor.objects.get(id=tutor_id)
+        animais = Animal.objects.filter(tutor=tutor).values('id', 'nome', 'especie')
+        return JsonResponse({'animais': list(animais)})
+    except Tutor.DoesNotExist:
+        return JsonResponse({'animais': []})
