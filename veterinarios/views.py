@@ -590,7 +590,9 @@ def listar_consultas(request):
 @login_required(login_url='/login/')
 def editar_consulta(request, consulta_id):
     """Permite editar uma consulta (principalmente status)"""
-    veterinario = get_object_or_404(Veterinario.objects.select_related('usuario'), usuario=request.user)
+    # Busca o veterinário - o manager customizado já limita os campos
+    veterinario = get_object_or_404(Veterinario.objects, usuario=request.user)
+    
     consulta = get_object_or_404(
         Appointment.objects.select_related('tutor', 'tutor__usuario', 'animal', 'clinic', 'service'),
         id=consulta_id,

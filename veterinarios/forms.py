@@ -178,6 +178,38 @@ class AppointmentForm(forms.ModelForm):
             'clinic': forms.Select(),
             'service': forms.Select(),
         }
+    
+    def __init__(self, *args, **kwargs):
+        # Remove 'veterinarian' dos kwargs antes de passar para super()
+        veterinarian = kwargs.pop('veterinarian', None)
+        super().__init__(*args, **kwargs)
+        
+        if veterinarian:
+            # Filtra tutores - todos os tutores podem ser selecionados
+            from tutores.models import Tutor
+            self.fields['tutor'].queryset = Tutor.objects.all()
+            
+            # Filtra clínicas do veterinário
+            self.fields['clinic'].queryset = Clinica.objects.filter(veterinario=veterinarian)
+            
+            # Filtra serviços das clínicas do veterinário
+            clinicas_ids = Clinica.objects.filter(veterinario=veterinarian).values_list('id', flat=True)
+            self.fields['service'].queryset = Service.objects.filter(clinic_id__in=clinicas_ids)
+            
+            # Animal será filtrado via AJAX baseado no tutor selecionado
+            from tutores.models import Animal
+            self.fields['animal'].queryset = Animal.objects.none()
+            
+            # Se já tem dados (POST), filtra animais do tutor selecionado
+            if 'tutor' in self.data:
+                try:
+                    tutor_id = int(self.data.get('tutor'))
+                    self.fields['animal'].queryset = Animal.objects.filter(tutor_id=tutor_id)
+                except (ValueError, TypeError):
+                    pass
+            elif self.instance and self.instance.pk:
+                # Se está editando, mostra o animal atual
+                self.fields['animal'].queryset = Animal.objects.filter(tutor=self.instance.tutor)
 
 
 class EditarConsultaForm(forms.ModelForm):
